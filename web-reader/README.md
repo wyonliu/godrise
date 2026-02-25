@@ -57,7 +57,7 @@ npx serve .
       "chapters": [
         {
           "title": "第一章：标题",
-          "file": "../02_Drafts/Book1_The_Arrival/Chapter_001.md",
+          "file": "../02_Drafts/Book1_灵机江湖/Chapter_001_入画.md",
           "wordCount": 3000
         }
       ]

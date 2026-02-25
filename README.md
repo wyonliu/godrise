@@ -1,10 +1,21 @@
 # 《神临山海》- Novel as Code 项目
 
-> 史诗级硬科幻四部曲 | 总计160万字 | AI协作创作
+> 史诗级硬科幻四部曲 | 每部40万字+ | 总计160万字 | AI协作创作
 
 ## 项目理念
 
-这是一个**"像写代码一样写小说"**的实验性项目。整个小说以代码项目的方式组织，利用 Cursor AI 的全库索引能力，实现 AI 对整部作品的"全知全能"式协作。
+这是一个**"像写代码一样写小说"**的实验性项目。整个小说以代码项目的方式组织，利用 AI 的全库索引能力，实现 AI 对整部作品的"全知全能"式协作。
+
+## 四部曲结构
+
+| 部 | 书名 | 字数 | 说明 |
+|----|------|------|------|
+| **第一部** | 《灵机江湖》 | 40万+ | 四篇：千里江山、清明上河、爱音塔、灵机海 |
+| **第二部** | 《天邑破晓》 | 40万+ | 浩劫与重建 |
+| **第三部** | 《众神觉醒》 | 40万+ | 星际探索 |
+| **第四部** | 《星汉余歌》 | 40万+ | 终焉与打破循环 |
+
+**第一部《灵机江湖》四篇**：卷一 千里江山（已完成25章）→ 卷二 清明上河 → 卷三 爱音塔 → 卷四 灵机海
 
 ## 目录结构
 
@@ -13,41 +24,33 @@
 ├── .cursorrules              # AI全局指令（核心配置文件）
 ├── README.md                 # 本文件
 │
-├── 00_World_Bible/           # 世界观数据库
-│   ├── technology.md        # 科技树与物理规则
-│   ├── geography.md         # 地理/星际设定
-│   ├── history.md           # 历史时间线
-│   ├── society.md           # 社会结构
-│   └── rules.md             # 核心规则设定
+├── 00_World_Bible/           # 世界观设定
+│   ├── index.md              # 世界观总索引
+│   ├── chronicle.md          # 完整编年史
+│   ├── power_system.md       # 灵机修行体系
+│   └── ...
 │
-├── 01_Characters/            # 人物数据库
-│   ├── protagonist_main.md  # 主角档案
-│   ├── antagonist_main.md   # 反派档案
-│   ├── supporting.md        # 配角档案
-│   └── relations_map.md     # 关系网络图
+├── 01_Characters/            # 人物档案
+│   ├── protagonist_main.md   # 麦洛/米莱
+│   ├── captain.md            # 船长
+│   └── ...
 │
 ├── 02_Drafts/                # 正文草稿
-│   ├── Book1_The_Arrival/   # 第一部：降临
-│   ├── Book2_The_Conflict/  # 第二部：冲突
-│   ├── Book3_The_Revelation/# 第三部：启示
-│   └── Book4_The_Ascension/ # 第四部：升华
+│   ├── Book1_灵机江湖/       # 第一部（含卷一千里江山25章）
+│   ├── Book2_天邑破晓/       # 第二部
+│   ├── Book3_众神觉醒/       # 第三部
+│   └── Book4_星汉余歌/       # 第四部
 │
-├── 03_Archives/              # 废弃稿/灵感碎片
+├── 04_Outlines/              # 大纲与创作资料
+│   ├── overall_outline.md    # 四部曲总体大纲
+│   └── ...
 │
-├── 04_Outlines/              # 大纲与情节追踪
-│   ├── overall_outline.md   # 总体大纲
-│   ├── plot-threads.md      # 伏笔追踪
-│   └── chapter_notes.md     # 章节笔记
-│
-├── 05_Reference/             # 参考素材库
-│   ├── style_samples/       # 风格参考片段
-│   ├── scene_templates/     # 场景模板
-│   └── research/            # 研究资料
+├── 05_Reference/             # 参考素材
 │
 └── web-reader/               # Web阅读器
     ├── index.html
     ├── reader.js
-    └── styles.css
+    └── chapters.json         # 目录索引
 ```
 
 ## 使用指南
@@ -63,7 +66,7 @@
 "根据 @01_Characters/protagonist_main.md，写一段主角的内心独白"
 
 # 多文件协作
-"主角在 @02_Drafts/Book1_The_Arrival/Chapter_050.md 中受伤，
+"主角在 @02_Drafts/Book1_灵机江湖/Chapter_014_补天.md 中受伤，
 请更新 @01_Characters/protagonist_main.md 的状态记录"
 ```
 
@@ -117,8 +120,8 @@ git commit -m "初始化《神临山海》项目"
 
 **分支策略建议**：
 - `main` - 主分支（稳定版本）
-- `book1-draft` - 第一部草稿分支
-- `book2-draft` - 第二部草稿分支
+- `book1-draft` - 第一部《灵机江湖》草稿
+- `book2-draft` - 第二部《天邑破晓》草稿
 - `experimental` - 实验性情节分支
 
 ## 工作流程
