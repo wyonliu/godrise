@@ -7,6 +7,7 @@
         "type": "world-building",
         "items": [
           { "title": "神临山海·作者总纲", "file": "godverse_summary.md", "icon": "✨", "slug": "godverse-summary", "wordCount": 15131 },
+          { "title": "作者意图与Agent原则", "file": "AUTHOR_PRINCIPLES.md", "icon": "📌", "slug": "author-principles", "wordCount": 2800 },
           { "title": "世界观总索引", "file": "00_World_Bible/index.md", "icon": "📚", "slug": "index", "wordCount": 3700 },
           { "title": "核心概念速查", "file": "00_World_Bible/quick_index.md", "icon": "🔍", "slug": "quick-index", "wordCount": 721 },
           { "title": "创作者愿景", "file": "00_World_Bible/creator_vision.md", "icon": "💫", "slug": "creator-vision", "wordCount": 2617 }
