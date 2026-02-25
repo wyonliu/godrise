@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>测试 - 百科全书数据加载</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+        .section { margin: 20px 0; padding: 10px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h1>百科全书数据加载测试</h1>
+    <div id="status">正在测试...</div>
+    <div id="results"></div>
+
+    <script>
+        async function test() {
+            const status = document.getElementById('status');
+            const results = document.getElementById('results');
+            
+            try {
+                status.innerHTML = '<p class="success">✓ 正在加载 chapters.json...</p>';
+                
+                const response = await fetch('chapters.json');
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                
+                status.innerHTML += '<p class="success">✓ 文件加载成功</p>';
+                
+                const data = await response.json();
+                status.innerHTML += '<p class="success">✓ JSON 解析成功</p>';
+                
+                if (!data.encyclopedia) {
+                    throw new Error('未找到 encyclopedia 字段');
+                }
+                
+                status.innerHTML += '<p class="success">✓ 找到 encyclopedia 数据</p>';
+                
+                const encyclopedia = data.encyclopedia;
+                status.innerHTML += `<p class="success">✓ 标题: ${encyclopedia.title}</p>`;
+                status.innerHTML += `<p class="success">✓ 分类数量: ${encyclopedia.sections.length}</p>`;
+                
+                // 显示所有分类
+                encyclopedia.sections.forEach((section, index) => {
+                    const sectionDiv = document.createElement('div');
+                    sectionDiv.className = 'section';
+                    sectionDiv.innerHTML = `
+                        <h3>分类 ${index + 1}: ${section.title}</h3>
+                        <p><strong>类型:</strong> ${section.type}</p>
+                        ${section.items ? `<p><strong>项目数:</strong> ${section.items.length}</p>` : ''}
+                        ${section.books ? `<p><strong>书籍数:</strong> ${section.books.length}</p>` : ''}
+                    `;
+                    results.appendChild(sectionDiv);
+                });
+                
+                status.innerHTML += '<p class="success"><strong>✓ 所有测试通过！</strong></p>';
+                
+            } catch (error) {
+                status.innerHTML += `<p class="error">✗ 错误: ${error.message}</p>`;
+                console.error('Test error:', error);
+            }
+        }
+        
+        test();
+    </script>
+</body>
+</html>

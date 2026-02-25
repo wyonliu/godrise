@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>神临山海 - Web阅读器</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1>神临山海</h1>
+                <button class="close-sidebar" id="closeSidebar">×</button>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜索章节内容...">
+                <button id="searchBtn">搜索</button>
+            </div>
+            <div class="theme-toggle">
+                <button id="themeToggle">🌙 暗色模式</button>
+            </div>
+            <nav class="chapter-nav" id="chapterNav">
+                <div class="loading">正在加载章节列表...</div>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <header class="toolbar">
+                <button class="menu-toggle" id="menuToggle">☰ 目录</button>
+                <div class="chapter-info" id="chapterInfo">
+                    <span>请选择章节</span>
+                </div>
+                <div class="toolbar-actions">
+                    <button id="prevChapter" disabled>上一章</button>
+                    <button id="nextChapter" disabled>下一章</button>
+                </div>
+            </header>
+            
+            <article class="reader-content" id="readerContent">
+                <div class="reading-progress" id="readingProgress"></div>
+                <div class="book-page">
+                    <div class="welcome-screen">
+                        <h2>欢迎阅读《神临山海》</h2>
+                        <p>请从左侧目录选择章节开始阅读</p>
+                        <div class="stats" id="stats">
+                            <p>📚 总章节数：<span id="totalChapters">-</span></p>
+                            <p>📝 总字数：<span id="totalWords">-</span></p>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- 搜索结果 -->
+            <div class="search-results" id="searchResults" style="display: none;">
+                <h3>搜索结果</h3>
+                <div id="searchResultsList"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="reader.js?v=4"></script>
+    <script>
+        // 调试信息
+        window.addEventListener('error', function(e) {
+            console.error('JavaScript Error:', e.error);
+            const nav = document.getElementById('chapterNav');
+            if (nav && nav.innerHTML.includes('正在加载')) {
+                nav.innerHTML = '<div class="error">JavaScript错误: ' + e.message + '</div>';
+            }
+        });
+    </script>
+</body>
+</html>
