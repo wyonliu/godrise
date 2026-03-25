@@ -3,156 +3,650 @@
     "title": "《神临山海》百科全书",
     "sections": [
       {
-        "title": "📖 核心索引",
-        "type": "world-building",
-        "items": [
-          { "title": "神临山海·作者总纲", "file": "godverse_summary.md", "icon": "✨", "slug": "godverse-summary", "wordCount": 15131 },
-          { "title": "作者意图与Agent原则", "file": "AUTHOR_PRINCIPLES.md", "icon": "📌", "slug": "author-principles", "wordCount": 2800 },
-          { "title": "世界观总索引", "file": "00_World_Bible/index.md", "icon": "📚", "slug": "index", "wordCount": 3700 },
-          { "title": "核心概念速查", "file": "00_World_Bible/quick_index.md", "icon": "🔍", "slug": "quick-index", "wordCount": 721 },
-          { "title": "创作者愿景", "file": "00_World_Bible/creator_vision.md", "icon": "💫", "slug": "creator-vision", "wordCount": 2617 }
-        ]
-      },
-      {
-        "title": "🌌 宇宙与终极",
-        "type": "world-building",
-        "items": [
-          { "title": "物理根基：熵之争", "file": "00_World_Bible/physics.md", "icon": "⚛️", "slug": "physics", "wordCount": 1717 },
-          { "title": "宇宙观与模拟论", "file": "00_World_Bible/cosmology.md", "icon": "🌌", "slug": "cosmology", "wordCount": 2817 },
-          { "title": "Architect架构师", "file": "00_World_Bible/architect.md", "icon": "👁️", "slug": "architect", "wordCount": 2466 },
-          { "title": "减一文明：点火者", "file": "00_World_Bible/n_minus_one.md", "icon": "🔥", "slug": "n-minus-one", "wordCount": 2075 },
-          { "title": "暗面宇宙设定", "file": "00_World_Bible/dark_universe.md", "icon": "🌑", "slug": "dark-universe", "wordCount": 3936 }
-        ]
-      },
-      {
-        "title": "⚡ 能力与修行",
-        "type": "world-building",
-        "items": [
-          { "title": "能力体系：灵机", "file": "00_World_Bible/power_system.md", "icon": "⚡", "slug": "power-system", "wordCount": 10178 },
-          { "title": "武器道具灵器", "file": "00_World_Bible/weapons.md", "icon": "🗡️", "slug": "weapons", "wordCount": 1315 },
-          { "title": "科技规则法则", "file": "00_World_Bible/technology.md", "icon": "🔬", "slug": "technology", "wordCount": 415 }
-        ]
-      },
-      {
-        "title": "🏛️ 社会与派系",
-        "type": "world-building",
-        "items": [
-          { "title": "四世界架构", "file": "00_World_Bible/four_worlds.md", "icon": "🌍", "slug": "four-worlds", "wordCount": 3547 },
-          { "title": "九大人类派系", "file": "00_World_Bible/factions.md", "icon": "🏛️", "slug": "factions", "wordCount": 10166 },
-          { "title": "社会结构形态", "file": "00_World_Bible/society.md", "icon": "👥", "slug": "society", "wordCount": 227 },
-          { "title": "科技树与演变", "file": "00_World_Bible/tech_evolution.md", "icon": "🔧", "slug": "tech-evolution", "wordCount": 1812 }
-        ]
-      },
-      {
-        "title": "📅 历史与地理",
-        "type": "world-building",
-        "items": [
-          { "title": "完整编年史", "file": "00_World_Bible/chronicle.md", "icon": "📅", "slug": "chronicle", "wordCount": 5205 },
-          { "title": "历史时间线", "file": "00_World_Bible/history.md", "icon": "⏳", "slug": "history", "wordCount": 237 },
-          { "title": "地理与星际", "file": "00_World_Bible/geography.md", "icon": "🗺️", "slug": "geography", "wordCount": 272 }
-        ]
-      },
-      {
-        "title": "☯️ 哲学与原则",
-        "type": "world-building",
-        "items": [
-          { "title": "核心冲突逻辑", "file": "00_World_Bible/core_conflicts.md", "icon": "⚔️", "slug": "core-conflicts", "wordCount": 2682 },
-          { "title": "哲学根基东方", "file": "00_World_Bible/philosophy_roots.md", "icon": "☯️", "slug": "philosophy-roots", "wordCount": 2775 },
-          { "title": "人类特殊性", "file": "00_World_Bible/humanity_unique.md", "icon": "🌟", "slug": "humanity-unique", "wordCount": 2913 },
-          { "title": "角色塑造原则", "file": "00_World_Bible/character_principles.md", "icon": "🎭", "slug": "character-principles", "wordCount": 2535 },
-          { "title": "核心规则法则", "file": "00_World_Bible/rules.md", "icon": "📜", "slug": "rules", "wordCount": 279 }
-        ]
-      },
-      {
-        "title": "👥 人物档案",
-        "type": "characters",
-        "items": [
-          { "title": "人物总索引", "file": "01_Characters/index.md", "icon": "📋", "slug": "characters-index", "wordCount": 170 },
-          { "title": "麦洛·主角档案", "file": "01_Characters/protagonist_main.md", "icon": "👧", "slug": "protagonist", "wordCount": 4148 },
-          { "title": "船长·核心角色", "file": "01_Characters/captain.md", "icon": "⚓", "slug": "captain", "wordCount": 3284 },
-          { "title": "反派角色档案", "file": "01_Characters/antagonist_main.md", "icon": "👿", "slug": "antagonist", "wordCount": 5426 },
-          { "title": "配角群像", "file": "01_Characters/supporting.md", "icon": "👥", "slug": "supporting", "wordCount": 5184 },
-          { "title": "关系网络图", "file": "01_Characters/relations_map.md", "icon": "🕸️", "slug": "relations-map", "wordCount": 1645 }
-        ]
-      },
-      {
         "title": "📖 正文内容",
         "type": "chapters",
         "books": [
           {
             "book": "第一部：灵机江湖 · 卷一 千里江山",
             "chapters": [
-              { "title": "第一章·入画", "file": "02_Drafts/Book1_灵机江湖/Chapter_001_入画.md", "wordCount": 4138, "slug": "1-001" },
-              { "title": "第二章·听竹", "file": "02_Drafts/Book1_灵机江湖/Chapter_002_听竹.md", "wordCount": 3765, "slug": "1-002" },
-              { "title": "第三章·幻破", "file": "02_Drafts/Book1_灵机江湖/Chapter_003_幻破.md", "wordCount": 4027, "slug": "1-003" },
-              { "title": "第四章·倒悬", "file": "02_Drafts/Book1_灵机江湖/Chapter_004_倒悬.md", "wordCount": 4024, "slug": "1-004" },
-              { "title": "第五章·隼啸", "file": "02_Drafts/Book1_灵机江湖/Chapter_005_隼啸.md", "wordCount": 4587, "slug": "1-005" },
-              { "title": "第六章·横舟", "file": "02_Drafts/Book1_灵机江湖/Chapter_006_横舟.md", "wordCount": 4138, "slug": "1-006" },
-              { "title": "第七章·墨鹿", "file": "02_Drafts/Book1_灵机江湖/Chapter_007_墨鹿.md", "wordCount": 4498, "slug": "1-007" },
-              { "title": "第八章·蟒影", "file": "02_Drafts/Book1_灵机江湖/Chapter_008_蟒影.md", "wordCount": 4985, "slug": "1-008" },
-              { "title": "第九章·崖闻", "file": "02_Drafts/Book1_灵机江湖/Chapter_009_崖闻.md", "wordCount": 5842, "slug": "1-009" },
-              { "title": "第十章·佛问", "file": "02_Drafts/Book1_灵机江湖/Chapter_010_佛问.md", "wordCount": 4368, "slug": "1-010" },
-              { "title": "第十一章·千目", "file": "02_Drafts/Book1_灵机江湖/Chapter_011_千目.md", "wordCount": 5154, "slug": "1-011" },
-              { "title": "第十二章·虫心", "file": "02_Drafts/Book1_灵机江湖/Chapter_012_虫心.md", "wordCount": 5025, "slug": "1-012" },
-              { "title": "第十三章·墨渡", "file": "02_Drafts/Book1_灵机江湖/Chapter_013_墨渡.md", "wordCount": 5188, "slug": "1-013" },
-              { "title": "第十四章·补天", "file": "02_Drafts/Book1_灵机江湖/Chapter_014_补天.md", "wordCount": 5992, "slug": "1-014" },
-              { "title": "第十五章·镜碎", "file": "02_Drafts/Book1_灵机江湖/Chapter_015_镜碎.md", "wordCount": 5126, "slug": "1-015" },
-              { "title": "第十六章·抱影", "file": "02_Drafts/Book1_灵机江湖/Chapter_016_抱影.md", "wordCount": 4939, "slug": "1-016" },
-              { "title": "第十七章·试刀", "file": "02_Drafts/Book1_灵机江湖/Chapter_017_试刀.md", "wordCount": 4813, "slug": "1-017" },
-              { "title": "第十八章·再闻", "file": "02_Drafts/Book1_灵机江湖/Chapter_018_再闻.md", "wordCount": 3959, "slug": "1-018" },
-              { "title": "第十九章·霜灯", "file": "02_Drafts/Book1_灵机江湖/Chapter_019_霜灯.md", "wordCount": 3775, "slug": "1-019" },
-              { "title": "第二十章·金散", "file": "02_Drafts/Book1_灵机江湖/Chapter_020_金散.md", "wordCount": 5024, "slug": "1-020" },
-              { "title": "第二十一章·燃灯", "file": "02_Drafts/Book1_灵机江湖/Chapter_021_燃灯.md", "wordCount": 4392, "slug": "1-021" },
-              { "title": "第二十二章·天裂", "file": "02_Drafts/Book1_灵机江湖/Chapter_022_天裂.md", "wordCount": 4607, "slug": "1-022" },
-              { "title": "第二十三章·不怕", "file": "02_Drafts/Book1_灵机江湖/Chapter_023_不怕.md", "wordCount": 3791, "slug": "1-023" },
-              { "title": "第二十四章·山海谣", "file": "02_Drafts/Book1_灵机江湖/Chapter_024_山海谣.md", "wordCount": 6137, "slug": "1-024" },
-              { "title": "第二十五章·千里", "file": "02_Drafts/Book1_灵机江湖/Chapter_025_千里.md", "wordCount": 5114, "slug": "1-025" }
+              {
+                "title": "第一章·入画",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_001_入画.md",
+                "wordCount": 4104,
+                "slug": "1-001"
+              },
+              {
+                "title": "第二章·听竹",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_002_听竹.md",
+                "wordCount": 6325,
+                "slug": "1-002"
+              },
+              {
+                "title": "第三章·幻破",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_003_幻破.md",
+                "wordCount": 3686,
+                "slug": "1-003"
+              },
+              {
+                "title": "第四章·倒悬",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_004_倒悬.md",
+                "wordCount": 6788,
+                "slug": "1-004"
+              },
+              {
+                "title": "第五章·隼啸",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_005_隼啸.md",
+                "wordCount": 7309,
+                "slug": "1-005"
+              },
+              {
+                "title": "第六章·横舟",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_006_横舟.md",
+                "wordCount": 5841,
+                "slug": "1-006"
+              },
+              {
+                "title": "第七章·墨鹿",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_007_墨鹿.md",
+                "wordCount": 5237,
+                "slug": "1-007"
+              },
+              {
+                "title": "第八章·蟒影",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_008_蟒影.md",
+                "wordCount": 6751,
+                "slug": "1-008"
+              },
+              {
+                "title": "第九章·崖闻",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_009_崖闻.md",
+                "wordCount": 5638,
+                "slug": "1-009"
+              },
+              {
+                "title": "第十章·佛问",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_010_佛问.md",
+                "wordCount": 8206,
+                "slug": "1-010"
+              },
+              {
+                "title": "第十一章·千目",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_011_千目.md",
+                "wordCount": 5873,
+                "slug": "1-011"
+              },
+              {
+                "title": "第十二章·虫心",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_012_虫心.md",
+                "wordCount": 5154,
+                "slug": "1-012"
+              },
+              {
+                "title": "第十三章·墨渡",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_013_墨渡.md",
+                "wordCount": 5006,
+                "slug": "1-013"
+              },
+              {
+                "title": "第十四章·补天",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_014_补天.md",
+                "wordCount": 6512,
+                "slug": "1-014"
+              },
+              {
+                "title": "第十五章·镜碎",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_015_镜碎.md",
+                "wordCount": 5324,
+                "slug": "1-015"
+              },
+              {
+                "title": "第十六章·抱影",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_016_抱影.md",
+                "wordCount": 4805,
+                "slug": "1-016"
+              },
+              {
+                "title": "第十七章·试刀",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_017_试刀.md",
+                "wordCount": 5926,
+                "slug": "1-017"
+              },
+              {
+                "title": "第十八章·再闻",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_018_再闻.md",
+                "wordCount": 4507,
+                "slug": "1-018"
+              },
+              {
+                "title": "第十九章·霜灯",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_019_霜灯.md",
+                "wordCount": 4888,
+                "slug": "1-019"
+              },
+              {
+                "title": "第二十章·金散",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_020_金散.md",
+                "wordCount": 4307,
+                "slug": "1-020"
+              },
+              {
+                "title": "第二十一章·燃灯",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_021_燃灯.md",
+                "wordCount": 4502,
+                "slug": "1-021"
+              },
+              {
+                "title": "第二十二章·天裂",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_022_天裂.md",
+                "wordCount": 5752,
+                "slug": "1-022"
+              },
+              {
+                "title": "第二十三章·不怕",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_023_不怕.md",
+                "wordCount": 5070,
+                "slug": "1-023"
+              },
+              {
+                "title": "第二十四章·山海谣",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_024_山海谣.md",
+                "wordCount": 4838,
+                "slug": "1-024"
+              },
+              {
+                "title": "第二十五章·千里",
+                "file": "02_Drafts/Book1_灵机江湖/Chapter_025_千里.md",
+                "wordCount": 5519,
+                "slug": "1-025"
+              }
             ]
           },
-          { "book": "第二部：天邑破晓", "chapters": [] },
-          { "book": "第三部：众神觉醒", "chapters": [] },
-          { "book": "第四部：星汉余歌", "chapters": [] }
+          {
+            "book": "第二部：天邑破晓",
+            "chapters": []
+          },
+          {
+            "book": "第三部：众神觉醒",
+            "chapters": []
+          },
+          {
+            "book": "第四部：星汉余歌",
+            "chapters": []
+          }
+        ]
+      },
+      {
+        "title": "📖 核心索引",
+        "type": "world-building",
+        "items": [
+          {
+            "title": "神临山海·作者总纲",
+            "file": "godverse_summary.md",
+            "icon": "✨",
+            "slug": "godverse-summary",
+            "wordCount": 14866
+          },
+          {
+            "title": "作者意图与Agent原则",
+            "file": "AUTHOR_PRINCIPLES.md",
+            "icon": "📌",
+            "slug": "author-principles",
+            "wordCount": 1376
+          },
+          {
+            "title": "世界观总索引",
+            "file": "00_World_Bible/index.md",
+            "icon": "📚",
+            "slug": "index",
+            "wordCount": 3509
+          },
+          {
+            "title": "核心概念速查",
+            "file": "00_World_Bible/quick_index.md",
+            "icon": "🔍",
+            "slug": "quick-index",
+            "wordCount": 631
+          },
+          {
+            "title": "创作者愿景",
+            "file": "00_World_Bible/creator_vision.md",
+            "icon": "💫",
+            "slug": "creator-vision",
+            "wordCount": 2572
+          }
+        ]
+      },
+      {
+        "title": "🌌 宇宙与终极",
+        "type": "world-building",
+        "items": [
+          {
+            "title": "物理根基：熵之争",
+            "file": "00_World_Bible/physics.md",
+            "icon": "⚛️",
+            "slug": "physics",
+            "wordCount": 1670
+          },
+          {
+            "title": "宇宙观与模拟论",
+            "file": "00_World_Bible/cosmology.md",
+            "icon": "🌌",
+            "slug": "cosmology",
+            "wordCount": 2724
+          },
+          {
+            "title": "Architect架构师",
+            "file": "00_World_Bible/architect.md",
+            "icon": "👁️",
+            "slug": "architect",
+            "wordCount": 2409
+          },
+          {
+            "title": "减一文明：点火者",
+            "file": "00_World_Bible/n_minus_one.md",
+            "icon": "🔥",
+            "slug": "n-minus-one",
+            "wordCount": 2044
+          },
+          {
+            "title": "暗面宇宙设定",
+            "file": "00_World_Bible/dark_universe.md",
+            "icon": "🌑",
+            "slug": "dark-universe",
+            "wordCount": 3690
+          }
+        ]
+      },
+      {
+        "title": "⚡ 能力与修行",
+        "type": "world-building",
+        "items": [
+          {
+            "title": "能力体系：灵机",
+            "file": "00_World_Bible/power_system.md",
+            "icon": "⚡",
+            "slug": "power-system",
+            "wordCount": 9905
+          },
+          {
+            "title": "武器道具灵器",
+            "file": "00_World_Bible/weapons.md",
+            "icon": "🗡️",
+            "slug": "weapons",
+            "wordCount": 1294
+          },
+          {
+            "title": "科技规则法则",
+            "file": "00_World_Bible/technology.md",
+            "icon": "🔬",
+            "slug": "technology",
+            "wordCount": 406
+          }
+        ]
+      },
+      {
+        "title": "🏛️ 社会与派系",
+        "type": "world-building",
+        "items": [
+          {
+            "title": "四世界架构",
+            "file": "00_World_Bible/four_worlds.md",
+            "icon": "🌍",
+            "slug": "four-worlds",
+            "wordCount": 3464
+          },
+          {
+            "title": "九大人类派系",
+            "file": "00_World_Bible/factions.md",
+            "icon": "🏛️",
+            "slug": "factions",
+            "wordCount": 9994
+          },
+          {
+            "title": "社会结构形态",
+            "file": "00_World_Bible/society.md",
+            "icon": "👥",
+            "slug": "society",
+            "wordCount": 227
+          },
+          {
+            "title": "科技树与演变",
+            "file": "00_World_Bible/tech_evolution.md",
+            "icon": "🔧",
+            "slug": "tech-evolution",
+            "wordCount": 1754
+          }
+        ]
+      },
+      {
+        "title": "📅 历史与地理",
+        "type": "world-building",
+        "items": [
+          {
+            "title": "完整编年史",
+            "file": "00_World_Bible/chronicle.md",
+            "icon": "📅",
+            "slug": "chronicle",
+            "wordCount": 5067
+          },
+          {
+            "title": "历史时间线",
+            "file": "00_World_Bible/history.md",
+            "icon": "⏳",
+            "slug": "history",
+            "wordCount": 237
+          },
+          {
+            "title": "地理与星际",
+            "file": "00_World_Bible/geography.md",
+            "icon": "🗺️",
+            "slug": "geography",
+            "wordCount": 272
+          }
+        ]
+      },
+      {
+        "title": "☯️ 哲学与原则",
+        "type": "world-building",
+        "items": [
+          {
+            "title": "核心冲突逻辑",
+            "file": "00_World_Bible/core_conflicts.md",
+            "icon": "⚔️",
+            "slug": "core-conflicts",
+            "wordCount": 2638
+          },
+          {
+            "title": "哲学根基东方",
+            "file": "00_World_Bible/philosophy_roots.md",
+            "icon": "☯️",
+            "slug": "philosophy-roots",
+            "wordCount": 2730
+          },
+          {
+            "title": "人类特殊性",
+            "file": "00_World_Bible/humanity_unique.md",
+            "icon": "🌟",
+            "slug": "humanity-unique",
+            "wordCount": 2861
+          },
+          {
+            "title": "角色塑造原则",
+            "file": "00_World_Bible/character_principles.md",
+            "icon": "🎭",
+            "slug": "character-principles",
+            "wordCount": 2497
+          },
+          {
+            "title": "核心规则法则",
+            "file": "00_World_Bible/rules.md",
+            "icon": "📜",
+            "slug": "rules",
+            "wordCount": 279
+          }
+        ]
+      },
+      {
+        "title": "👥 人物档案",
+        "type": "characters",
+        "items": [
+          {
+            "title": "人物总索引",
+            "file": "01_Characters/index.md",
+            "icon": "📋",
+            "slug": "characters-index",
+            "wordCount": 159
+          },
+          {
+            "title": "麦洛·主角档案",
+            "file": "01_Characters/protagonist_main.md",
+            "icon": "👧",
+            "slug": "protagonist",
+            "wordCount": 4098
+          },
+          {
+            "title": "船长·核心角色",
+            "file": "01_Characters/captain.md",
+            "icon": "⚓",
+            "slug": "captain",
+            "wordCount": 3219
+          },
+          {
+            "title": "反派角色档案",
+            "file": "01_Characters/antagonist_main.md",
+            "icon": "👿",
+            "slug": "antagonist",
+            "wordCount": 5403
+          },
+          {
+            "title": "配角群像",
+            "file": "01_Characters/supporting.md",
+            "icon": "👥",
+            "slug": "supporting",
+            "wordCount": 5148
+          },
+          {
+            "title": "关系网络图",
+            "file": "01_Characters/relations_map.md",
+            "icon": "🕸️",
+            "slug": "relations-map",
+            "wordCount": 1616
+          }
         ]
       },
       {
         "title": "📋 创作过程",
         "type": "outlines",
         "items": [
-          { "title": "总体大纲", "file": "04_Outlines/overall_outline.md", "icon": "📝", "slug": "overall-outline", "wordCount": 9547 },
-          { "title": "章节改造计划", "file": "04_Outlines/chapter_improvement_plan.md", "icon": "🔧", "slug": "chapter-improvement", "wordCount": 5029 },
-          { "title": "终极审判v2", "file": "05_Reference/masterpiece_analysis/final_verdict_v2.md", "icon": "⚖️", "slug": "final-verdict", "wordCount": 3698 },
-          { "title": "主题曲·山海谣", "file": "00_World_Bible/melody_song.md", "icon": "🎵", "slug": "melody-song", "wordCount": 2246 },
-          { "title": "第一部写作准备总纲", "file": "04_Outlines/book1_writing_prep.md", "icon": "🎯", "slug": "book1-writing-prep", "wordCount": 4120 },
-          { "title": "第一部四篇章情感框架", "file": "04_Outlines/book1_emotional_framework.md", "icon": "💫", "slug": "book1-emotional-framework", "wordCount": 2107 },
-          { "title": "伏笔追踪表", "file": "04_Outlines/plot-threads.md", "icon": "🔗", "slug": "plot-threads", "wordCount": 1599 },
-          { "title": "创作工作日志", "file": "04_Outlines/work_journal.md", "icon": "📔", "slug": "work-journal", "wordCount": 3652 },
-          { "title": "共创对话日志", "file": "05_Reference/co_creation_log.md", "icon": "💬", "slug": "co-creation-log", "wordCount": 4686 },
-          { "title": "百科全书总索引", "file": "ENCYCLOPEDIA.md", "icon": "📖", "slug": "encyclopedia-index", "wordCount": 569 }
+          {
+            "title": "总体大纲",
+            "file": "04_Outlines/overall_outline.md",
+            "icon": "📝",
+            "slug": "overall-outline",
+            "wordCount": 9381
+          },
+          {
+            "title": "章节改造计划",
+            "file": "04_Outlines/chapter_improvement_plan.md",
+            "icon": "🔧",
+            "slug": "chapter-improvement",
+            "wordCount": 4915
+          },
+          {
+            "title": "终极审判v2",
+            "file": "05_Reference/masterpiece_analysis/final_verdict_v2.md",
+            "icon": "⚖️",
+            "slug": "final-verdict",
+            "wordCount": 3664
+          },
+          {
+            "title": "主题曲·山海谣",
+            "file": "00_World_Bible/melody_song.md",
+            "icon": "🎵",
+            "slug": "melody-song",
+            "wordCount": 2177
+          },
+          {
+            "title": "第一部写作准备总纲",
+            "file": "04_Outlines/book1_writing_prep.md",
+            "icon": "🎯",
+            "slug": "book1-writing-prep",
+            "wordCount": 4030
+          },
+          {
+            "title": "第一部四篇章情感框架",
+            "file": "04_Outlines/book1_emotional_framework.md",
+            "icon": "💫",
+            "slug": "book1-emotional-framework",
+            "wordCount": 2078
+          },
+          {
+            "title": "伏笔追踪表",
+            "file": "04_Outlines/plot-threads.md",
+            "icon": "🔗",
+            "slug": "plot-threads",
+            "wordCount": 1581
+          },
+          {
+            "title": "创作工作日志",
+            "file": "04_Outlines/work_journal.md",
+            "icon": "📔",
+            "slug": "work-journal",
+            "wordCount": 3474
+          },
+          {
+            "title": "共创对话日志",
+            "file": "05_Reference/co_creation_log.md",
+            "icon": "💬",
+            "slug": "co-creation-log",
+            "wordCount": 4513
+          },
+          {
+            "title": "百科全书总索引",
+            "file": "ENCYCLOPEDIA.md",
+            "icon": "📖",
+            "slug": "encyclopedia-index",
+            "wordCount": 462
+          }
         ]
       },
       {
         "title": "📚 参考材料",
         "type": "reference",
         "items": [
-          { "title": "科幻内核总索引", "file": "05_Reference/科幻内核/index.md", "icon": "🔬", "slug": "sf-index", "wordCount": 546 },
-          { "title": "三体系列内核", "file": "05_Reference/科幻内核/三体系列/index.md", "icon": "🌍", "slug": "three-body", "wordCount": 400 },
-          { "title": "基地系列内核", "file": "05_Reference/科幻内核/基地系列/index.md", "icon": "🏛️", "slug": "foundation", "wordCount": 327 },
-          { "title": "沙丘系列内核", "file": "05_Reference/科幻内核/沙丘系列/index.md", "icon": "🏜️", "slug": "dune", "wordCount": 297 },
-          { "title": "海伯利安系列", "file": "05_Reference/科幻内核/海伯利安系列/index.md", "icon": "⏳", "slug": "hyperion", "wordCount": 284 },
-          { "title": "神经漫游者系列", "file": "05_Reference/科幻内核/神经漫游者系列/index.md", "icon": "💻", "slug": "neuromancer", "wordCount": 284 },
-          { "title": "其他经典作品", "file": "05_Reference/科幻内核/其他经典/index.md", "icon": "📚", "slug": "sf-other", "wordCount": 162 },
-          { "title": "经典作品深度分析", "file": "05_Reference/masterpiece_analysis/index.md", "icon": "🎯", "slug": "masterpiece-analysis", "wordCount": 4934 },
-          { "title": "灵感点子库索引", "file": "05_Reference/inspiration_vault/index.md", "icon": "🌟", "slug": "inspiration-index", "wordCount": 1839 },
-          { "title": "底层哲学与真相", "file": "05_Reference/inspiration_vault/philosophy_core.md", "icon": "🌌", "slug": "philosophy-core", "wordCount": 2328 },
-          { "title": "第一部灵感集", "file": "05_Reference/inspiration_vault/book1_ideas.md", "icon": "🎮", "slug": "book1-ideas", "wordCount": 3938 },
-          { "title": "第二部灵感集", "file": "05_Reference/inspiration_vault/book2_ideas.md", "icon": "🏙️", "slug": "book2-ideas", "wordCount": 2444 },
-          { "title": "第三部灵感集", "file": "05_Reference/inspiration_vault/book3_ideas.md", "icon": "⚡", "slug": "book3-ideas", "wordCount": 2622 },
-          { "title": "第四部灵感集", "file": "05_Reference/inspiration_vault/book4_ideas.md", "icon": "🌠", "slug": "book4-ideas", "wordCount": 2772 },
-          { "title": "AGI觉醒与未来", "file": "05_Reference/inspiration_vault/agi_awakening.md", "icon": "🤖", "slug": "agi-awakening", "wordCount": 2873 },
-          { "title": "剧情碎片与点子", "file": "05_Reference/inspiration_vault/plot_fragments.md", "icon": "🎬", "slug": "plot-fragments", "wordCount": 2300 },
-          { "title": "永恒的终结分析", "file": "05_Reference/inspiration_vault/eternity_analysis.md", "icon": "📖", "slug": "eternity-analysis", "wordCount": 2090 },
-          { "title": "早期灵感点滴", "file": "05_Reference/inspiration_vault/early_ideas_2021.md", "icon": "📜", "slug": "early-ideas", "wordCount": 2390 },
-          { "title": "创作方法论守则", "file": "05_Reference/inspiration_vault/creation_methodology.md", "icon": "🎯", "slug": "creation-methodology", "wordCount": 2320 }
+          {
+            "title": "科幻内核总索引",
+            "file": "05_Reference/科幻内核/index.md",
+            "icon": "🔬",
+            "slug": "sf-index",
+            "wordCount": 534
+          },
+          {
+            "title": "三体系列内核",
+            "file": "05_Reference/科幻内核/三体系列/index.md",
+            "icon": "🌍",
+            "slug": "three-body",
+            "wordCount": 400
+          },
+          {
+            "title": "基地系列内核",
+            "file": "05_Reference/科幻内核/基地系列/index.md",
+            "icon": "🏛️",
+            "slug": "foundation",
+            "wordCount": 326
+          },
+          {
+            "title": "沙丘系列内核",
+            "file": "05_Reference/科幻内核/沙丘系列/index.md",
+            "icon": "🏜️",
+            "slug": "dune",
+            "wordCount": 297
+          },
+          {
+            "title": "海伯利安系列",
+            "file": "05_Reference/科幻内核/海伯利安系列/index.md",
+            "icon": "⏳",
+            "slug": "hyperion",
+            "wordCount": 280
+          },
+          {
+            "title": "神经漫游者系列",
+            "file": "05_Reference/科幻内核/神经漫游者系列/index.md",
+            "icon": "💻",
+            "slug": "neuromancer",
+            "wordCount": 280
+          },
+          {
+            "title": "其他经典作品",
+            "file": "05_Reference/科幻内核/其他经典/index.md",
+            "icon": "📚",
+            "slug": "sf-other",
+            "wordCount": 162
+          },
+          {
+            "title": "经典作品深度分析",
+            "file": "05_Reference/masterpiece_analysis/index.md",
+            "icon": "🎯",
+            "slug": "masterpiece-analysis",
+            "wordCount": 4891
+          },
+          {
+            "title": "灵感点子库索引",
+            "file": "05_Reference/inspiration_vault/index.md",
+            "icon": "🌟",
+            "slug": "inspiration-index",
+            "wordCount": 1664
+          },
+          {
+            "title": "底层哲学与真相",
+            "file": "05_Reference/inspiration_vault/philosophy_core.md",
+            "icon": "🌌",
+            "slug": "philosophy-core",
+            "wordCount": 2294
+          },
+          {
+            "title": "第一部灵感集",
+            "file": "05_Reference/inspiration_vault/book1_ideas.md",
+            "icon": "🎮",
+            "slug": "book1-ideas",
+            "wordCount": 3870
+          },
+          {
+            "title": "第二部灵感集",
+            "file": "05_Reference/inspiration_vault/book2_ideas.md",
+            "icon": "🏙️",
+            "slug": "book2-ideas",
+            "wordCount": 2403
+          },
+          {
+            "title": "第三部灵感集",
+            "file": "05_Reference/inspiration_vault/book3_ideas.md",
+            "icon": "⚡",
+            "slug": "book3-ideas",
+            "wordCount": 2549
+          },
+          {
+            "title": "第四部灵感集",
+            "file": "05_Reference/inspiration_vault/book4_ideas.md",
+            "icon": "🌠",
+            "slug": "book4-ideas",
+            "wordCount": 2740
+          },
+          {
+            "title": "AGI觉醒与未来",
+            "file": "05_Reference/inspiration_vault/agi_awakening.md",
+            "icon": "🤖",
+            "slug": "agi-awakening",
+            "wordCount": 2777
+          },
+          {
+            "title": "剧情碎片与点子",
+            "file": "05_Reference/inspiration_vault/plot_fragments.md",
+            "icon": "🎬",
+            "slug": "plot-fragments",
+            "wordCount": 2225
+          },
+          {
+            "title": "永恒的终结分析",
+            "file": "05_Reference/inspiration_vault/eternity_analysis.md",
+            "icon": "📖",
+            "slug": "eternity-analysis",
+            "wordCount": 2059
+          },
+          {
+            "title": "早期灵感点滴",
+            "file": "05_Reference/inspiration_vault/early_ideas_2021.md",
+            "icon": "📜",
+            "slug": "early-ideas",
+            "wordCount": 2339
+          },
+          {
+            "title": "创作方法论守则",
+            "file": "05_Reference/inspiration_vault/creation_methodology.md",
+            "icon": "🎯",
+            "slug": "creation-methodology",
+            "wordCount": 2264
+          }
         ]
       }
     ]

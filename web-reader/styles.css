@@ -1954,3 +1954,124 @@ body {
         font-size: 0.75rem;
     }
 }
+
+/* ============================================================
+   MOBILE TABBAR & OPTIMIZATIONS (added layer, zero impact on desktop)
+   ============================================================ */
+
+/* Tabbar — hidden on desktop */
+.mobile-tabbar {
+    display: none;
+}
+.mobile-search-bar {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    /* ── Bottom Tabbar ── */
+    .mobile-tabbar {
+        display: flex;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        height: 56px;
+        background: var(--bg-paper);
+        border-top: 1px solid var(--border);
+        z-index: 3000;
+        justify-content: space-around;
+        align-items: center;
+        padding-bottom: env(safe-area-inset-bottom, 0);
+        box-sizing: content-box;
+    }
+    .tabbar-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        flex: 1;
+        height: 100%;
+        border: none;
+        background: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        font-size: 0;
+    }
+    .tabbar-item span { font-size: 0.6rem; font-weight: 500; }
+    .tabbar-item svg { width: 22px; height: 22px; }
+    .tabbar-item:active, .tabbar-item.active { color: var(--copper); }
+
+    /* ── Mobile search bar (slides down from top) ── */
+    .mobile-search-bar {
+        display: flex;
+        position: fixed;
+        top: var(--header-height);
+        left: 0; right: 0;
+        padding: 0.5rem 0.75rem;
+        background: var(--bg-paper);
+        border-bottom: 1px solid var(--border);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        z-index: 2500;
+        gap: 0.5rem;
+        align-items: center;
+        transform: translateY(-100%);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+    .mobile-search-bar.open {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .mobile-search-bar input {
+        flex: 1;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.6rem 0.75rem;
+        font-size: 1rem;
+        background: var(--bg-main);
+        color: var(--text-primary);
+        outline: none;
+    }
+    .mobile-search-bar input:focus { border-color: var(--copper); }
+    .mobile-search-bar button {
+        border: none;
+        background: var(--copper);
+        color: #fff;
+        border-radius: 8px;
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+    #mobileSearchClose {
+        background: none;
+        color: var(--text-muted);
+        padding: 0.6rem;
+        font-size: 1.1rem;
+    }
+
+    /* ── Hide desktop footer, adjust content for tabbar ── */
+    .page-footer { display: none; }
+    .main-content { margin-bottom: 56px; }
+
+    /* ── Header: only show brand on mobile, tabbar handles the rest ── */
+    .header-actions { display: none; }
+    .menu-toggle { display: none; }
+    .unified-header { justify-content: center; }
+
+    /* ── Sidebar above tabbar ── */
+    .sidebar { height: calc(100vh - var(--header-height) - 56px); }
+
+    /* ── Right panel full-width on mobile ── */
+    .right-panel {
+        width: 100% !important;
+        max-width: 100% !important;
+        bottom: 56px !important;
+    }
+
+    /* ── Content text ── */
+    .book-page { padding: 1.5rem 1rem; }
+    #content { font-size: 15px; line-height: 1.9; }
+}

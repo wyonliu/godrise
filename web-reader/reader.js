@@ -569,6 +569,86 @@ function initUI() {
             sidebar.classList.remove('open');
         };
     }
+
+    // ── Mobile bottom tabbar ──
+    setupMobileTabbar(sidebar);
+}
+
+function setupMobileTabbar(sidebar) {
+    const tabbar = document.getElementById('mobileTabbar');
+    if (!tabbar) return;
+
+    const mobileSearchBar = document.getElementById('mobileSearchBar');
+    const mobileSearchInput = document.getElementById('mobileSearchInput');
+    const mobileSearchGo = document.getElementById('mobileSearchGo');
+    const mobileSearchClose = document.getElementById('mobileSearchClose');
+
+    function closeSidebar() {
+        sidebar?.classList.remove('open');
+    }
+    function closeAll(except) {
+        if (except !== 'sidebar') closeSidebar();
+        if (except !== 'search') mobileSearchBar?.classList.remove('open');
+        if (except !== 'toc' && typeof closeRightPanel === 'function') closeRightPanel();
+        if (except !== 'settings') document.getElementById('settingsDrawer')?.classList.remove('open');
+        tabbar.querySelectorAll('.tabbar-item').forEach(t => t.classList.remove('active'));
+    }
+
+    document.getElementById('tabSidebar')?.addEventListener('click', () => {
+        const open = sidebar?.classList.contains('open');
+        closeAll('sidebar');
+        if (open) closeSidebar();
+        else { sidebar?.classList.add('open'); document.getElementById('tabSidebar')?.classList.add('active'); }
+    });
+
+    document.getElementById('tabSearch')?.addEventListener('click', () => {
+        const open = mobileSearchBar?.classList.contains('open');
+        closeAll('search');
+        if (open) { mobileSearchBar?.classList.remove('open'); }
+        else {
+            mobileSearchBar?.classList.add('open');
+            document.getElementById('tabSearch')?.classList.add('active');
+            setTimeout(() => mobileSearchInput?.focus(), 150);
+        }
+    });
+
+    // Mobile search → reuse performSearch
+    function doMobileSearch() {
+        const q = mobileSearchInput?.value.trim();
+        if (q && typeof performSearch === 'function') {
+            performSearch(q);
+            mobileSearchBar?.classList.remove('open');
+            document.getElementById('tabSearch')?.classList.remove('active');
+        }
+    }
+    mobileSearchGo?.addEventListener('click', doMobileSearch);
+    mobileSearchInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') doMobileSearch(); });
+    mobileSearchClose?.addEventListener('click', () => {
+        mobileSearchBar?.classList.remove('open');
+        document.getElementById('tabSearch')?.classList.remove('active');
+    });
+
+    document.getElementById('tabToc')?.addEventListener('click', () => {
+        const panel = document.getElementById('rightPanel');
+        const open = panel?.classList.contains('open');
+        closeAll('toc');
+        if (open) { if (typeof closeRightPanel === 'function') closeRightPanel(); }
+        else { if (typeof openRightPanel === 'function') openRightPanel(); document.getElementById('tabToc')?.classList.add('active'); }
+    });
+
+    document.getElementById('tabInteraction')?.addEventListener('click', () => {
+        closeAll();
+        if (typeof showInteractionPage === 'function') showInteractionPage();
+        window.location.hash = 'interaction';
+    });
+
+    document.getElementById('tabSettings')?.addEventListener('click', () => {
+        const drawer = document.getElementById('settingsDrawer');
+        const open = drawer?.classList.contains('open');
+        closeAll('settings');
+        if (open) drawer?.classList.remove('open');
+        else { drawer?.classList.add('open'); document.getElementById('tabSettings')?.classList.add('active'); }
+    });
 }
 
 function initTheme() {
@@ -994,54 +1074,66 @@ function setupSearch() {
     });
 }
 
+// Search content cache — persists across searches in the same session
+const _searchCache = {};
+
 async function performSearch(query) {
     const panel = document.getElementById('searchResultsPanel');
     const list = document.getElementById('searchResultsList');
-    
+
     if (!panel || !list) return;
-    
-    list.innerHTML = '<div style="text-align: center; padding: 3rem; color: var(--text-muted);">搜索中...</div>';
+
+    const total = state.allItems.length;
+    list.innerHTML = `<div style="text-align: center; padding: 3rem; color: var(--text-muted);">搜索中… <span id="searchProgress">0</span>/${total} 文档</div>`;
     panel.classList.add('show');
-    
-    // 按文档分组的结果，每个文档包含多个匹配
-    const groupedResults = [];
-    
-    for (const item of state.allItems) {
-        try {
+
+    // Fetch all documents in parallel (with cache), then search
+    const progressEl = () => document.getElementById('searchProgress');
+    let fetched = 0;
+
+    // Parallel fetch with concurrency limit of 8
+    const BATCH = 8;
+    for (let i = 0; i < total; i += BATCH) {
+        const batch = state.allItems.slice(i, i + BATCH);
+        await Promise.all(batch.map(async (item) => {
             const path = resolvePath(item.file);
-            const response = await fetch(path);
-            if (response.ok) {
-                const text = await response.text();
-                const lowerText = text.toLowerCase();
-                const lowerQuery = query.toLowerCase();
-                
-                // 查找所有匹配
-                const matches = [];
-                let searchIndex = 0;
-                let matchIndex;
-                
-                while ((matchIndex = lowerText.indexOf(lowerQuery, searchIndex)) !== -1) {
-                    const start = Math.max(0, matchIndex - 50);
-                    const end = Math.min(text.length, matchIndex + query.length + 50);
-                    const snippet = text.substring(start, end);
-                    
-                    // 计算行号（用于定位）
-                    const lineNum = text.substring(0, matchIndex).split('\n').length;
-                    
-                    matches.push({ 
-                        snippet, 
-                        position: matchIndex,
-                        lineNum 
-                    });
-                    searchIndex = matchIndex + query.length;
-                }
-                
-                if (matches.length > 0) {
-                    groupedResults.push({ item, matches, matchCount: matches.length });
-                }
+            if (!_searchCache[path]) {
+                try {
+                    const res = await fetch(path);
+                    if (res.ok) _searchCache[path] = await res.text();
+                } catch (e) { /* skip */ }
             }
-        } catch (error) {
-            console.error(`搜索 ${item.title} 失败:`, error);
+            fetched++;
+            const el = progressEl();
+            if (el) el.textContent = fetched;
+        }));
+    }
+
+    // Now search locally — very fast
+    const groupedResults = [];
+    const lowerQuery = query.toLowerCase();
+
+    for (const item of state.allItems) {
+        const path = resolvePath(item.file);
+        const text = _searchCache[path];
+        if (!text) continue;
+
+        const lowerText = text.toLowerCase();
+        const matches = [];
+        let searchIndex = 0;
+        let matchIndex;
+
+        while ((matchIndex = lowerText.indexOf(lowerQuery, searchIndex)) !== -1) {
+            const start = Math.max(0, matchIndex - 50);
+            const end = Math.min(text.length, matchIndex + query.length + 50);
+            const snippet = text.substring(start, end);
+            const lineNum = text.substring(0, matchIndex).split('\n').length;
+            matches.push({ snippet, position: matchIndex, lineNum });
+            searchIndex = matchIndex + query.length;
+        }
+
+        if (matches.length > 0) {
+            groupedResults.push({ item, matches, matchCount: matches.length });
         }
     }
     
@@ -1830,7 +1922,7 @@ function setupInlineComments() {
         document.body.appendChild(popup);
     }
     
-    contentArea.addEventListener('mouseup', () => {
+    function showPopupForSelection() {
         setTimeout(() => {
             const sel = window.getSelection();
             const text = sel.toString().trim();
@@ -1845,9 +1937,15 @@ function setupInlineComments() {
                 popup.style.display = 'none';
             }
         }, 10);
-    });
-    
+    }
+
+    contentArea.addEventListener('mouseup', showPopupForSelection);
+    contentArea.addEventListener('touchend', showPopupForSelection);
+
     document.addEventListener('mousedown', e => {
+        if (!e.target.closest('#commentPopup')) popup.style.display = 'none';
+    });
+    document.addEventListener('touchstart', e => {
         if (!e.target.closest('#commentPopup')) popup.style.display = 'none';
     });
     
