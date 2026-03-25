@@ -1821,3 +1821,136 @@ body {
     .collapsible-header { padding: 0.75rem 1rem; }
     .collapsible-body { padding: 1rem; }
 }
+
+/* ====== VOTING ====== */
+.vote-section {
+    text-align: center;
+    padding: 1.5rem 0;
+    margin-top: 2rem;
+    border-top: 1px solid var(--border);
+}
+
+.vote-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 2rem;
+    border: 2px solid var(--border);
+    border-radius: 50px;
+    background: var(--bg-paper);
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.vote-btn:hover {
+    border-color: var(--copper);
+    color: var(--copper);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(184, 115, 51, 0.15);
+}
+
+.vote-btn:active {
+    transform: scale(0.95);
+}
+
+.vote-btn.voted {
+    border-color: var(--copper);
+    background: var(--copper-light);
+    color: var(--copper);
+}
+
+.vote-icon {
+    font-size: 1.2rem;
+    transition: transform 0.3s;
+}
+
+.vote-btn:hover .vote-icon,
+.vote-btn.voted .vote-icon {
+    transform: scale(1.2);
+}
+
+.vote-btn.voted .vote-icon {
+    animation: heartBeat 0.4s ease;
+}
+
+@keyframes heartBeat {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.4); }
+    60% { transform: scale(0.9); }
+    100% { transform: scale(1.2); }
+}
+
+.vote-count {
+    font-weight: 600;
+    min-width: 1em;
+}
+
+.vote-label {
+    font-size: 0.8rem;
+}
+
+/* ====== MOBILE BOTTOM BAR ====== */
+@media (max-width: 768px) {
+    .vote-btn {
+        padding: 0.6rem 1.5rem;
+        font-size: 0.8rem;
+    }
+    .vote-section {
+        padding: 1rem 0;
+        margin-top: 1.5rem;
+    }
+
+    /* Bigger touch targets for chapter items */
+    .chapter-item {
+        padding: 0.75rem 1.25rem;
+        min-height: 44px;
+    }
+
+    /* Better comment touch targets */
+    .reply-btn {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
+        min-height: 36px;
+    }
+
+    .cs-submit {
+        padding: 0.5rem 1.25rem;
+        font-size: 0.8rem;
+        min-height: 40px;
+    }
+
+    /* Swipe hint on first visit */
+    .swipe-hint {
+        position: fixed;
+        bottom: calc(var(--footer-height) + 1rem);
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.7);
+        color: #fff;
+        padding: 0.5rem 1.25rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        z-index: 999;
+        animation: fadeIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+        pointer-events: none;
+    }
+
+    @keyframes fadeOut {
+        to { opacity: 0; }
+    }
+}
+
+/* ====== NICKNAME MODAL (simpler than old login) ====== */
+.login-overlay .login-card {
+    max-width: 320px;
+}
+
+@media (max-width: 430px) {
+    .vote-btn {
+        padding: 0.5rem 1.25rem;
+        font-size: 0.75rem;
+    }
+}

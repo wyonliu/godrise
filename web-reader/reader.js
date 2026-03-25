@@ -66,8 +66,6 @@ async function pushInitialToCloud() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('📖 《神临山海》系统启动...');
-    initCopyProtection();
-    if (!state.user) { showLoginModal(); return; }
     await bootApp();
 });
 
@@ -81,6 +79,7 @@ async function bootApp() {
     setupKeyboardShortcuts();
     setupInlineComments();
     setupCommentSidebar();
+    setupSwipeNavigation();
     startReadTimeTracking();
     state.viewCount++;
     localStorage.setItem('viewCount', state.viewCount);
@@ -406,6 +405,7 @@ async function loadItem(sIdx, idx1, idx2, type, scrollAnchor) {
                         <button class="chapter-nav-btn" id="topNextBtn" ${!hasNext ? 'disabled' : ''}>下一章 ›</button>
                     </div>
                     ${html}
+                    <div class="vote-section" id="voteContainer"></div>
                     <div class="chapter-nav-bottom">
                         <button class="chapter-nav-btn" id="bottomPrevBtn" ${!hasPrev ? 'disabled' : ''}>‹ 上一章</button>
                         <span class="chapter-info-inline">${item.bookTitle || item.sectionTitle}</span>
@@ -451,6 +451,10 @@ async function loadItem(sIdx, idx1, idx2, type, scrollAnchor) {
             initProgressTracker();
             initTOCScrollSpy();
             state._lastPath = getPathFromItem(item);
+
+            // Render vote button for this page
+            const voteKey = getPageKey();
+            renderVoteButton(voteKey);
 
             if (window.innerWidth <= 1024) {
                 document.getElementById('sidebar').classList.remove('open');
@@ -802,27 +806,33 @@ window.toggleCollapsible = (header) => {
 };
 
 window.submitComment = async () => {
-    if (!ensureLoggedIn()) return;
     const input = document.getElementById('comInput');
     const val = input?.value.trim();
     if (!val) return;
 
-    const comment = {
-        id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
-        user: state.user.nickname,
-        email: state.user.email,
-        text: val,
-        time: new Date().toLocaleString(),
-        replies: []
+    const doSubmit = () => {
+        const comment = {
+            id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+            user: state.user ? state.user.nickname : '匿名读者',
+            email: state.user ? state.user.email : 'anon',
+            text: val,
+            time: new Date().toLocaleString(),
+            replies: []
+        };
+        state.comments.unshift(comment);
+        localStorage.setItem('comments', JSON.stringify(state.comments));
+        input.value = '';
+        renderComments();
+        apiCall('/api/comments', 'POST', { action: 'add', comment }).then(r => {
+            if (r && r.comments) { state.comments = r.comments; localStorage.setItem('comments', JSON.stringify(r.comments)); renderComments(); }
+        });
     };
 
-    state.comments.unshift(comment);
-    localStorage.setItem('comments', JSON.stringify(state.comments));
-    input.value = '';
-    renderComments();
-
-    const r = await apiCall('/api/comments', 'POST', { action: 'add', comment });
-    if (r && r.comments) { state.comments = r.comments; localStorage.setItem('comments', JSON.stringify(r.comments)); renderComments(); }
+    if (!state.user) {
+        showNicknamePrompt(doSubmit);
+    } else {
+        doSubmit();
+    }
 };
 
 function renderComments() {
@@ -886,7 +896,6 @@ function escapeHTML(str) {
 }
 
 function toggleReplyBox(commentId) {
-    if (!ensureLoggedIn()) return;
     const box = document.getElementById('reply-box-' + commentId);
     if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
 }
@@ -896,28 +905,35 @@ async function submitReply(parentId) {
     const val = input?.value.trim();
     if (!val) return;
 
-    const reply = {
-        id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
-        user: state.user.nickname,
-        email: state.user.email,
-        text: val,
-        time: new Date().toLocaleString(),
-        replies: []
+    const doReply = () => {
+        const reply = {
+            id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+            user: state.user ? state.user.nickname : '匿名读者',
+            email: state.user ? state.user.email : 'anon',
+            text: val,
+            time: new Date().toLocaleString(),
+            replies: []
+        };
+        function addReplyLocal(comments) {
+            for (const c of comments) {
+                if (c.id === parentId) { c.replies = c.replies || []; c.replies.push(reply); return true; }
+                if (c.replies && addReplyLocal(c.replies)) return true;
+            }
+            return false;
+        }
+        addReplyLocal(state.comments);
+        localStorage.setItem('comments', JSON.stringify(state.comments));
+        renderComments();
+        apiCall('/api/comments', 'POST', { action: 'reply', parentId, reply }).then(r => {
+            if (r && r.comments) { state.comments = r.comments; localStorage.setItem('comments', JSON.stringify(r.comments)); renderComments(); }
+        });
     };
 
-    function addReplyLocal(comments) {
-        for (const c of comments) {
-            if (c.id === parentId) { c.replies = c.replies || []; c.replies.push(reply); return true; }
-            if (c.replies && addReplyLocal(c.replies)) return true;
-        }
-        return false;
+    if (!state.user) {
+        showNicknamePrompt(doReply);
+    } else {
+        doReply();
     }
-    addReplyLocal(state.comments);
-    localStorage.setItem('comments', JSON.stringify(state.comments));
-    renderComments();
-
-    const r = await apiCall('/api/comments', 'POST', { action: 'reply', parentId, reply });
-    if (r && r.comments) { state.comments = r.comments; localStorage.setItem('comments', JSON.stringify(r.comments)); renderComments(); }
 }
 
 async function deleteCommentById(id) {
@@ -1738,49 +1754,42 @@ function openCommentSidebar(quote) {
 
 function closeCommentSidebar() { closeRightPanel(); }
 
-/* ====== LOGIN SYSTEM ====== */
-function showLoginModal() {
-    let modal = document.getElementById('loginModal');
-    if (modal) { modal.style.display = 'flex'; return; }
+/* ====== NICKNAME SYSTEM (no login required) ====== */
+function showNicknamePrompt(callback) {
+    let modal = document.getElementById('nickModal');
+    if (modal) { modal.remove(); }
     modal = document.createElement('div');
-    modal.id = 'loginModal';
+    modal.id = 'nickModal';
     modal.className = 'login-overlay';
     modal.innerHTML = `
     <div class="login-card">
-        <div class="login-logo">《神临山海》</div>
-        <p class="login-subtitle">史诗硬核科幻神话四部曲</p>
-        <div class="login-field">
-            <label>邮箱</label>
-            <input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email"/>
-        </div>
+        <div class="login-logo">起个名字</div>
+        <p class="login-subtitle">留言需要一个昵称，仅此而已</p>
         <div class="login-field">
             <label>昵称</label>
-            <input type="text" id="loginNick" placeholder="起一个名字" maxlength="20" autocomplete="nickname"/>
+            <input type="text" id="nickInput" placeholder="你的名字" maxlength="20" autocomplete="nickname"/>
         </div>
-        <button id="loginSubmit" class="login-btn">进入山海</button>
-        <p class="login-note">无需密码，仅用于评论署名</p>
+        <button id="nickSubmit" class="login-btn">确定</button>
+        <button id="nickCancel" class="login-btn" style="background:var(--bg-sidebar);color:var(--text-secondary);margin-top:0.5rem;">取消</button>
     </div>`;
     document.body.appendChild(modal);
-    document.getElementById('loginSubmit').onclick = handleLogin;
-    document.getElementById('loginNick').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+    document.getElementById('nickSubmit').onclick = () => {
+        const nick = document.getElementById('nickInput').value.trim();
+        if (!nick) { alert('请输入昵称'); return; }
+        state.user = { nickname: nick, email: nick + '@reader', joinedAt: new Date().toISOString() };
+        localStorage.setItem('slsh_user', JSON.stringify(state.user));
+        modal.remove();
+        updateUserDisplay();
+        if (callback) callback();
+    };
+    document.getElementById('nickCancel').onclick = () => { modal.remove(); };
+    document.getElementById('nickInput').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('nickSubmit').click(); });
+    setTimeout(() => document.getElementById('nickInput').focus(), 100);
 }
 
-function handleLogin() {
-    const email = document.getElementById('loginEmail').value.trim();
-    const nick = document.getElementById('loginNick').value.trim();
-    if (!email || !nick) { alert('请填写邮箱和昵称'); return; }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('请输入有效的邮箱地址'); return; }
-    state.user = { email, nickname: nick, joinedAt: new Date().toISOString() };
-    localStorage.setItem('slsh_user', JSON.stringify(state.user));
-    const users = JSON.parse(localStorage.getItem('slsh_users') || '[]');
-    if (!users.find(u => u.email === email)) { users.push(state.user); localStorage.setItem('slsh_users', JSON.stringify(users)); }
-    document.getElementById('loginModal').style.display = 'none';
-    bootApp();
-}
-
-function ensureLoggedIn() {
+function ensureLoggedIn(callback) {
     if (state.user) return true;
-    showLoginModal();
+    showNicknamePrompt(callback);
     return false;
 }
 
@@ -1805,29 +1814,7 @@ function updateUserDisplay() {
     };
 }
 
-/* ====== COPY PROTECTION ====== */
-function initCopyProtection() {
-    const style = document.createElement('style');
-    style.textContent = `@media print { body { display: none !important; } }`;
-    document.head.appendChild(style);
-    document.addEventListener('copy', e => {
-        if (!e.target.closest('input, textarea')) e.preventDefault();
-    });
-    document.addEventListener('cut', e => {
-        if (!e.target.closest('input, textarea')) e.preventDefault();
-    });
-    document.addEventListener('contextmenu', e => {
-        if (!e.target.closest('input, textarea')) e.preventDefault();
-    });
-    document.addEventListener('keydown', e => {
-        if ((e.ctrlKey || e.metaKey) && ['p','P','s','S'].includes(e.key)) {
-            if (!e.target.closest('input, textarea')) e.preventDefault();
-        }
-        if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'C')) {
-            if (!e.target.closest('input, textarea')) e.preventDefault();
-        }
-    });
-}
+/* ====== COPY PROTECTION removed - reader-friendly ====== */
 
 /* ====== INLINE COMMENTS (text selection) ====== */
 function setupInlineComments() {
@@ -1865,7 +1852,6 @@ function setupInlineComments() {
     });
     
     document.getElementById('popupCommentBtn').onclick = () => {
-        if (!ensureLoggedIn()) return;
         const quote = popup._selectedText;
         popup.style.display = 'none';
         openCommentSidebar(quote);
@@ -1880,34 +1866,40 @@ function getPageKey() {
 }
 
 async function submitInlineComment() {
-    if (!ensureLoggedIn()) return;
     const input = document.getElementById('csInput');
-    const val = input.value.trim();
+    const val = input?.value.trim();
     if (!val) return;
-    const panel = document.getElementById('rightPanel');
-    const key = getPageKey();
-    if (!state.inlineComments[key]) state.inlineComments[key] = [];
 
-    const comment = {
-        id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
-        user: state.user.nickname,
-        email: state.user.email,
-        text: val,
-        quote: panel._quote || '',
-        time: new Date().toLocaleString(),
-        replies: []
+    const doSubmit = () => {
+        const panel = document.getElementById('rightPanel');
+        const key = getPageKey();
+        if (!state.inlineComments[key]) state.inlineComments[key] = [];
+        const comment = {
+            id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+            user: state.user ? state.user.nickname : '匿名读者',
+            email: state.user ? state.user.email : 'anon',
+            text: val,
+            quote: panel._quote || '',
+            time: new Date().toLocaleString(),
+            replies: []
+        };
+        state.inlineComments[key].unshift(comment);
+        localStorage.setItem('inlineComments', JSON.stringify(state.inlineComments));
+        input.value = '';
+        panel._quote = '';
+        document.getElementById('csQuote').style.display = 'none';
+        renderInlineComments();
+        updateCommentBadge();
+        apiCall('/api/inline-comments', 'POST', { page: key, action: 'add', comment }).then(r => {
+            if (r && r.comments) { state.inlineComments[key] = r.comments; localStorage.setItem('inlineComments', JSON.stringify(state.inlineComments)); renderInlineComments(); }
+        });
     };
 
-    state.inlineComments[key].unshift(comment);
-    localStorage.setItem('inlineComments', JSON.stringify(state.inlineComments));
-    input.value = '';
-    panel._quote = '';
-    document.getElementById('csQuote').style.display = 'none';
-    renderInlineComments();
-    updateCommentBadge();
-
-    const r = await apiCall('/api/inline-comments', 'POST', { page: key, action: 'add', comment });
-    if (r && r.comments) { state.inlineComments[key] = r.comments; localStorage.setItem('inlineComments', JSON.stringify(state.inlineComments)); renderInlineComments(); }
+    if (!state.user) {
+        showNicknamePrompt(doSubmit);
+    } else {
+        doSubmit();
+    }
 }
 
 function renderInlineComments() {
@@ -1961,7 +1953,6 @@ function renderSidebarCommentHTML(c, depth) {
 }
 
 function toggleInlineReplyBox(id) {
-    if (!ensureLoggedIn()) return;
     const box = document.getElementById('ir-box-' + id);
     if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
 }
@@ -1970,22 +1961,32 @@ async function submitInlineReply(parentId) {
     const input = document.getElementById('ir-input-' + parentId);
     const val = input?.value.trim();
     if (!val) return;
-    const key = getPageKey();
-    const reply = {
-        id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
-        user: state.user.nickname, email: state.user.email,
-        text: val, time: new Date().toLocaleString(), replies: []
-    };
-    function add(arr) {
-        for (const c of arr) { if (c.id === parentId) { c.replies = c.replies || []; c.replies.push(reply); return true; } if (c.replies && add(c.replies)) return true; }
-        return false;
-    }
-    add(state.inlineComments[key] || []);
-    localStorage.setItem('inlineComments', JSON.stringify(state.inlineComments));
-    renderInlineComments();
 
-    const r = await apiCall('/api/inline-comments', 'POST', { page: key, action: 'reply', parentId, reply });
-    if (r && r.comments) { state.inlineComments[key] = r.comments; localStorage.setItem('inlineComments', JSON.stringify(state.inlineComments)); }
+    const doReply = () => {
+        const key = getPageKey();
+        const reply = {
+            id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+            user: state.user ? state.user.nickname : '匿名读者',
+            email: state.user ? state.user.email : 'anon',
+            text: val, time: new Date().toLocaleString(), replies: []
+        };
+        function add(arr) {
+            for (const c of arr) { if (c.id === parentId) { c.replies = c.replies || []; c.replies.push(reply); return true; } if (c.replies && add(c.replies)) return true; }
+            return false;
+        }
+        add(state.inlineComments[key] || []);
+        localStorage.setItem('inlineComments', JSON.stringify(state.inlineComments));
+        renderInlineComments();
+        apiCall('/api/inline-comments', 'POST', { page: key, action: 'reply', parentId, reply }).then(r => {
+            if (r && r.comments) { state.inlineComments[key] = r.comments; localStorage.setItem('inlineComments', JSON.stringify(state.inlineComments)); }
+        });
+    };
+
+    if (!state.user) {
+        showNicknamePrompt(doReply);
+    } else {
+        doReply();
+    }
 }
 
 async function deleteInlineComment(id) {
@@ -1999,3 +2000,68 @@ async function deleteInlineComment(id) {
         if (r && r.comments) { state.inlineComments[key] = r.comments; localStorage.setItem('inlineComments', JSON.stringify(state.inlineComments)); }
     }
 }
+
+/* ====== VOTING SYSTEM ====== */
+const votes = JSON.parse(localStorage.getItem('slsh_votes') || '{}');
+
+async function loadVotes(pageKey) {
+    const data = await apiCall('/api/votes?page=' + encodeURIComponent(pageKey));
+    if (data && typeof data.likes === 'number') return data;
+    return { likes: 0 };
+}
+
+async function submitVote(pageKey) {
+    const myVotes = JSON.parse(localStorage.getItem('slsh_my_votes') || '{}');
+    if (myVotes[pageKey]) {
+        // Toggle off
+        delete myVotes[pageKey];
+        localStorage.setItem('slsh_my_votes', JSON.stringify(myVotes));
+        await apiCall('/api/votes', 'POST', { page: pageKey, action: 'unlike' });
+    } else {
+        myVotes[pageKey] = true;
+        localStorage.setItem('slsh_my_votes', JSON.stringify(myVotes));
+        await apiCall('/api/votes', 'POST', { page: pageKey, action: 'like' });
+    }
+    renderVoteButton(pageKey);
+}
+
+async function renderVoteButton(pageKey) {
+    const container = document.getElementById('voteContainer');
+    if (!container) return;
+    const myVotes = JSON.parse(localStorage.getItem('slsh_my_votes') || '{}');
+    const isLiked = !!myVotes[pageKey];
+    const data = await loadVotes(pageKey);
+    const count = data.likes || 0;
+    container.innerHTML = `
+        <button class="vote-btn ${isLiked ? 'voted' : ''}" onclick="submitVote('${pageKey}')">
+            <span class="vote-icon">${isLiked ? '❤️' : '🤍'}</span>
+            <span class="vote-count">${count > 0 ? count : ''}</span>
+            <span class="vote-label">${isLiked ? '已喜欢' : '喜欢本章'}</span>
+        </button>
+    `;
+}
+
+window.submitVote = submitVote;
+
+/* ====== TOUCH SWIPE NAVIGATION ====== */
+function setupSwipeNavigation() {
+    const reader = document.getElementById('readerContent');
+    if (!reader) return;
+    let startX = 0, startY = 0, startTime = 0;
+    reader.addEventListener('touchstart', e => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        startTime = Date.now();
+    }, { passive: true });
+    reader.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].clientX - startX;
+        const dy = e.changedTouches[0].clientY - startY;
+        const dt = Date.now() - startTime;
+        // Quick horizontal swipe (>80px, <300ms, more horizontal than vertical)
+        if (dt < 300 && Math.abs(dx) > 80 && Math.abs(dx) > Math.abs(dy) * 2) {
+            if (dx > 0) navigateChapter(-1); // swipe right = prev
+            else navigateChapter(1); // swipe left = next
+        }
+    }, { passive: true });
+}
+

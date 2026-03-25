@@ -32,3 +32,7 @@ Thumbs.db
 .codelink
 .vercel
 .wrangler
+
+# 工作日志/记忆文件（私有，不入库）
+mem_log_*.md
+*.memory.md
