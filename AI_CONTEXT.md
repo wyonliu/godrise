@@ -115,7 +115,9 @@
 
 - **文档格式**: Markdown
 - **阅读器**: 纯HTML/CSS/JS，无框架依赖
-- **服务器**: Python SimpleHTTPServer（端口8000）
+- **部署**: Cloudflare Pages ([godrise.pages.dev](https://godrise.pages.dev))
+- **API**: Cloudflare Workers + KV（评论/投票）
+- **本地**: Python SimpleHTTPServer（端口8000）
 
 ---
 
@@ -151,5 +153,6 @@
 
 ---
 
-**版本**: v1.1
-**最后更新**: 2026-01-30
+**版本**: v1.2
+**最后更新**: 2026-03-25
+**当前状态**: 卷一25章完稿，11轮精磨，评分9.5+/10
