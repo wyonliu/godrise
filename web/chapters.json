@@ -1,0 +1,163 @@
+{
+  "encyclopedia": {
+    "title": "《神临山海》百科全书",
+    "sections": [
+      {
+        "title": "正文",
+        "type": "chapters",
+        "books": [
+          {
+            "book": "第一部·灵机江湖 卷一·千里江山（旧版）",
+            "chapters": [
+              { "title": "第一章·入画", "file": "_staging/manuscript/book1_vol1/ch01_入画.md", "slug": "1-001" },
+              { "title": "第二章·听竹", "file": "_staging/manuscript/book1_vol1/ch02_听竹.md", "slug": "1-002" },
+              { "title": "第三章·幻破", "file": "_staging/manuscript/book1_vol1/ch03_幻破.md", "slug": "1-003" },
+              { "title": "第四章·倒悬", "file": "_staging/manuscript/book1_vol1/ch04_倒悬.md", "slug": "1-004" },
+              { "title": "第五章·隼啸", "file": "_staging/manuscript/book1_vol1/ch05_隼啸.md", "slug": "1-005" },
+              { "title": "第六章·横舟", "file": "_staging/manuscript/book1_vol1/ch06_横舟.md", "slug": "1-006" },
+              { "title": "第七章·墨鹿", "file": "_staging/manuscript/book1_vol1/ch07_墨鹿.md", "slug": "1-007" },
+              { "title": "第八章·蟒影", "file": "_staging/manuscript/book1_vol1/ch08_蟒影.md", "slug": "1-008" },
+              { "title": "第九章·崖闻", "file": "_staging/manuscript/book1_vol1/ch09_崖闻.md", "slug": "1-009" },
+              { "title": "第十章·佛问", "file": "_staging/manuscript/book1_vol1/ch10_佛问.md", "slug": "1-010" },
+              { "title": "第十一章·千目", "file": "_staging/manuscript/book1_vol1/ch11_千目.md", "slug": "1-011" },
+              { "title": "第十二章·虫心", "file": "_staging/manuscript/book1_vol1/ch12_虫心.md", "slug": "1-012" },
+              { "title": "第十三章·墨渡", "file": "_staging/manuscript/book1_vol1/ch13_墨渡.md", "slug": "1-013" },
+              { "title": "第十四章·补天", "file": "_staging/manuscript/book1_vol1/ch14_补天.md", "slug": "1-014" },
+              { "title": "第十五章·镜碎", "file": "_staging/manuscript/book1_vol1/ch15_镜碎.md", "slug": "1-015" },
+              { "title": "第十六章·抱影", "file": "_staging/manuscript/book1_vol1/ch16_抱影.md", "slug": "1-016" },
+              { "title": "第十七章·试刀", "file": "_staging/manuscript/book1_vol1/ch17_试刀.md", "slug": "1-017" },
+              { "title": "第十八章·再闻", "file": "_staging/manuscript/book1_vol1/ch18_再闻.md", "slug": "1-018" },
+              { "title": "第十九章·霜灯", "file": "_staging/manuscript/book1_vol1/ch19_霜灯.md", "slug": "1-019" },
+              { "title": "第二十章·金散", "file": "_staging/manuscript/book1_vol1/ch20_金散.md", "slug": "1-020" },
+              { "title": "第二十一章·燃灯", "file": "_staging/manuscript/book1_vol1/ch21_燃灯.md", "slug": "1-021" },
+              { "title": "第二十二章·天裂", "file": "_staging/manuscript/book1_vol1/ch22_天裂.md", "slug": "1-022" },
+              { "title": "第二十三章·不怕", "file": "_staging/manuscript/book1_vol1/ch23_不怕.md", "slug": "1-023" },
+              { "title": "第二十四章·山海谣", "file": "_staging/manuscript/book1_vol1/ch24_山海谣.md", "slug": "1-024" },
+              { "title": "第二十五章·千里", "file": "_staging/manuscript/book1_vol1/ch25_千里.md", "slug": "1-025" }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "宇宙与终极",
+        "type": "world-building",
+        "items": [
+          { "title": "物理根基：寂熵与灵机", "file": "cosmology/physics.md", "icon": "", "slug": "physics" },
+          { "title": "宇宙观与模拟论", "file": "bible/cosmology.md", "icon": "", "slug": "cosmology" },
+          { "title": "Architect 架构师", "file": "cosmology/architect.md", "icon": "", "slug": "architect" },
+          { "title": "减一文明：点火者", "file": "cosmology/n_minus_one.md", "icon": "", "slug": "n-minus-one" },
+          { "title": "暗面宇宙", "file": "cosmology/dark_universe.md", "icon": "", "slug": "dark-universe" },
+          { "title": "四世界架构", "file": "cosmology/four_worlds.md", "icon": "", "slug": "four-worlds" },
+          { "title": "五个外星文明", "file": "cosmology/five_civilizations.md", "icon": "", "slug": "five-civilizations" }
+        ]
+      },
+      {
+        "title": "力量体系",
+        "type": "world-building",
+        "items": [
+          { "title": "灵机与魂·核心公式", "file": "power/system.md", "icon": "", "slug": "power-system" },
+          { "title": "灵机理论深度", "file": "power/lingji_theory.md", "icon": "", "slug": "lingji-theory" },
+          { "title": "修行十三境", "file": "power/cultivation.md", "icon": "", "slug": "cultivation" },
+          { "title": "战斗体系·七灵武道", "file": "power/combat.md", "icon": "", "slug": "combat" },
+          { "title": "战力校准系统", "file": "power/calibration.md", "icon": "", "slug": "calibration" },
+          { "title": "进化形态路径", "file": "power/evolution.md", "icon": "", "slug": "evolution" },
+          { "title": "武器道具灵器", "file": "power/weapons.md", "icon": "", "slug": "weapons" }
+        ]
+      },
+      {
+        "title": "AI 与硅基",
+        "type": "world-building",
+        "items": [
+          { "title": "AI 架构硬科学", "file": "ai/ai_architecture_science.md", "icon": "", "slug": "ai-architecture" },
+          { "title": "AI 发展版本全览", "file": "ai/ai_dev_versions.md", "icon": "", "slug": "ai-dev-versions" },
+          { "title": "硅方者三阶段", "file": "ai/ai_silicon_stages.md", "icon": "", "slug": "silicon-stages" },
+          { "title": "觉醒体系", "file": "ai/awakening_system.md", "icon": "", "slug": "awakening" },
+          { "title": "七灯 AI", "file": "ai/seven_lamps.md", "icon": "", "slug": "seven-lamps" },
+          { "title": "硅基隐喻集", "file": "ai/silicon_metaphors.md", "icon": "", "slug": "silicon-metaphors" }
+        ]
+      },
+      {
+        "title": "世界设定",
+        "type": "world-building",
+        "items": [
+          { "title": "山海虚拟世界", "file": "world/book1_worlds.md", "icon": "", "slug": "shanhai-worlds" },
+          { "title": "山海与现实镜像", "file": "world/shanhai_mirror_realworld.md", "icon": "", "slug": "shanhai-mirror" },
+          { "title": "九大派系", "file": "world/book2_factions.md", "icon": "", "slug": "factions" },
+          { "title": "MoReal 梦如集团", "file": "world/moreal_group.md", "icon": "", "slug": "moreal" }
+        ]
+      },
+      {
+        "title": "人物档案",
+        "type": "characters",
+        "items": [
+          { "title": "人物总索引", "file": "characters/index.md", "icon": "", "slug": "characters-index" },
+          { "title": "核心六人", "file": "characters/book_0_core.md", "icon": "", "slug": "core-six" },
+          { "title": "第一部群像", "file": "characters/book_1_cast.md", "icon": "", "slug": "book1-cast" },
+          { "title": "第二部群像", "file": "characters/book_2_cast.md", "icon": "", "slug": "book2-cast" },
+          { "title": "第三部群像", "file": "characters/book_3_cast.md", "icon": "", "slug": "book3-cast" },
+          { "title": "第四部群像", "file": "characters/book_4_cast.md", "icon": "", "slug": "book4-cast" },
+          { "title": "关系网络", "file": "characters/relations_map.md", "icon": "", "slug": "relations" },
+          { "title": "命运线索", "file": "characters/destiny_threads.md", "icon": "", "slug": "destiny" }
+        ]
+      },
+      {
+        "title": "编年史",
+        "type": "world-building",
+        "items": [
+          { "title": "万年总览", "file": "chronicle/index_eon.md", "icon": "", "slug": "chronicle-eon" },
+          { "title": "编年简表", "file": "reference/chronicle_brief.md", "icon": "", "slug": "chronicle-brief" },
+          { "title": "太初纪·远古", "file": "chronicle/book_0_ancient.md", "icon": "", "slug": "chronicle-ancient" },
+          { "title": "第一部", "file": "chronicle/book_1.md", "icon": "", "slug": "chronicle-book1" },
+          { "title": "第二部 卷五", "file": "chronicle/book_2_vol1.md", "icon": "", "slug": "chronicle-b2v1" },
+          { "title": "第二部 卷六", "file": "chronicle/book_2_vol2.md", "icon": "", "slug": "chronicle-b2v2" },
+          { "title": "第二部 卷七", "file": "chronicle/book_2_vol3.md", "icon": "", "slug": "chronicle-b2v3" },
+          { "title": "第二部 卷八", "file": "chronicle/book_2_vol4.md", "icon": "", "slug": "chronicle-b2v4" },
+          { "title": "第三部", "file": "chronicle/book_3.md", "icon": "", "slug": "chronicle-book3" },
+          { "title": "第四部", "file": "chronicle/book_4.md", "icon": "", "slug": "chronicle-book4" }
+        ]
+      },
+      {
+        "title": "创作原则",
+        "type": "world-building",
+        "items": [
+          { "title": "创作者愿景", "file": "principle/author_vision.md", "icon": "", "slug": "author-vision" },
+          { "title": "语言质量铁律", "file": "principle/literary_standards.md", "icon": "", "slug": "literary-standards" },
+          { "title": "角色塑造原则", "file": "principle/character_principles.md", "icon": "", "slug": "character-principles" },
+          { "title": "核心冲突逻辑", "file": "principle/core_conflicts.md", "icon": "", "slug": "core-conflicts" },
+          { "title": "哲学根基", "file": "principle/philosophy_roots.md", "icon": "", "slug": "philosophy-roots" },
+          { "title": "人类特殊性", "file": "principle/humanity_unique.md", "icon": "", "slug": "humanity-unique" },
+          { "title": "四劫叙事风格", "file": "principle/four_tribulations_style.md", "icon": "", "slug": "four-tribulations" },
+          { "title": "第四部叙事技术", "file": "principle/book4_narrative_techniques.md", "icon": "", "slug": "book4-narrative" },
+          { "title": "第一部设计", "file": "principle/book1_design.md", "icon": "", "slug": "book1-design" },
+          { "title": "流程标准", "file": "principle/process_standards.md", "icon": "", "slug": "process-standards" }
+        ]
+      },
+      {
+        "title": "圣经原典",
+        "type": "world-building",
+        "items": [
+          { "title": "宇宙观原典", "file": "bible/cosmology.md", "icon": "", "slug": "bible-cosmology" },
+          { "title": "世界观原典", "file": "bible/world.md", "icon": "", "slug": "bible-world" },
+          { "title": "力量体系原典", "file": "bible/power.md", "icon": "", "slug": "bible-power" },
+          { "title": "AI 原典", "file": "bible/ai.md", "icon": "", "slug": "bible-ai" },
+          { "title": "核心角色原典", "file": "bible/characters_book0.md", "icon": "", "slug": "bible-chars0" },
+          { "title": "第一部角色原典", "file": "bible/characters_book1.md", "icon": "", "slug": "bible-chars1" },
+          { "title": "第一部时间线", "file": "bible/timeline_book1.md", "icon": "", "slug": "bible-tl1" },
+          { "title": "第二部时间线", "file": "bible/timeline_book2.md", "icon": "", "slug": "bible-tl2" }
+        ]
+      },
+      {
+        "title": "参考材料",
+        "type": "reference",
+        "items": [
+          { "title": "大师作品借鉴", "file": "reference/masterwork_bible.md", "icon": "", "slug": "masterwork" },
+          { "title": "伟大作品基因图谱", "file": "reference/greatness_reference.md", "icon": "", "slug": "greatness" },
+          { "title": "角色设计研究", "file": "reference/character_design_research.md", "icon": "", "slug": "char-design" },
+          { "title": "文笔风格基准", "file": "reference/style_samples.md", "icon": "", "slug": "style-samples" },
+          { "title": "山海四版本对照", "file": "reference/shanhai_four_versions_master.md", "icon": "", "slug": "shanhai-versions" },
+          { "title": "灵感火花集", "file": "reference/sparkles.md", "icon": "", "slug": "sparkles" }
+        ]
+      }
+    ]
+  }
+}
