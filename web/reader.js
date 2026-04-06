@@ -1228,27 +1228,38 @@ async function updateStats() {
     const wordsEl = document.getElementById('totalWords');
     const settingWordsEl = document.getElementById('settingWords');
     const chapterWordsEl = document.getElementById('chapterWords');
-    
+
     const formatCount = (n) => n >= 10000 ? (n / 10000).toFixed(1) + '万' : n.toLocaleString();
-    
+
     if (totalEl) totalEl.textContent = state.allItems.length;
-    
+
     let chapterWordCount = 0;
     let settingWordCount = 0;
-    
-    state.allItems.forEach(item => {
-        const wc = item.wordCount || 0;
-        if (item.type === 'chapter') chapterWordCount += wc;
-        else settingWordCount += wc;
+
+    // 并发 fetch 所有文件计算真实字数
+    const tasks = state.allItems.map(async (item) => {
+        if (!item.file) return;
+        try {
+            const res = await fetch(item.file);
+            if (!res.ok) return;
+            const text = await res.text();
+            // 中文字数：去除 markdown 标记、空白后计算字符数
+            const clean = text.replace(/^#+\s.*$/gm, '').replace(/[#*_`\[\]()>|\-\n\r\s]/g, '');
+            const wc = clean.length;
+            item.wordCount = wc;
+            if (item.type === 'chapter') chapterWordCount += wc;
+            else settingWordCount += wc;
+        } catch (e) { /* 静默跳过不可达文件 */ }
     });
-    
+    await Promise.all(tasks);
+
     state.cachedChapterWords = chapterWordCount;
     state.cachedSettingWords = settingWordCount;
-    
+
     if (chapterWordsEl) chapterWordsEl.textContent = formatCount(chapterWordCount);
     if (settingWordsEl) settingWordsEl.textContent = formatCount(settingWordCount);
     if (wordsEl) wordsEl.textContent = formatCount(settingWordCount + chapterWordCount);
-    
+
     console.log(`📊 字数统计: 设定${formatCount(settingWordCount)}, 正文${formatCount(chapterWordCount)}`);
 }
 
