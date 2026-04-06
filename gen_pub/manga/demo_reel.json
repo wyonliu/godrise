@@ -1,0 +1,66 @@
+{
+  "title": "神临山海 · Ch01 入画 · Demo Reel",
+  "style_dna": "雾山五行 × 蜘蛛侠纵横宇宙 × 深海 × 界外狂潮 × 遗忘之海 — 武侠朋克",
+  "panels": [
+    {
+      "id": 1,
+      "scene": "九色渊·全景",
+      "prompt": "Extreme bird's-eye view of a colossal circular abyss carved into jade-green mountains, nine bands of luminous mineral color spiral outward from the dark center — emerald, amber, cerulean, vermillion, indigo, pearl, obsidian, gold, violet — each band is liquid light with visible mineral pigment texture like crushed Dunhuang mural fresco. Mist pours over mountain edges like ink wash spilling off rice paper. In the highest sky a faint translucent geodesic data-grid rotates slowly, casting hexagonal shadow patterns on the water. Tiny bioluminescent particles drift upward from the abyss like inverted snow. The color palette referencesErta Ale lava lake meets Jiuzhaigou Five-Color Pool meets auroral plasma. Wuxia punk aesthetic: traditional Chinese ink wash dynamism of Fog Hill of Five Elements combined with the halftone-dot mixed-media collage energy of Spider-Verse, the deep-sea bioluminescence of Deep Sea (2023), the cold geometric cosmic dread of Outburst, and the submerged ethereal beauty of Sea of Solitude. Cinematic 16:9 widescreen, 4K, masterpiece quality, no text, no watermark.",
+      "narration": "九色渊的水有九种颜色。",
+      "dialogue": [],
+      "duration_sec": 8,
+      "camera": "slow_zoom",
+      "transition": "fade_in"
+    },
+    {
+      "id": 8,
+      "scene": "麦洛·浮出水面",
+      "prompt": "A 14-year-old Chinese girl rising from luminous nine-colored water in extreme slow motion, her long black hair spreading like calligraphy ink strokes dissolving in liquid — each strand trails a different mineral color. Eyes closed, lips curved in a sleeping smile that is ancient and newborn at once. Five-color water streams from her shoulders and collarbones in ribbons of liquid light. The water surface shatters around her like cracking stained glass, each shard refracting a micro-rainbow. Behind her: jade mountains glow with scattered warm light through mist. Above: a translucent rotating data-lattice dome like a cosmic ceiling. The entire frame EXPLODES with color — not garish but deep, mineral, earned — Dunhuang fresco vermillion and malachite green and lapis lazuli blue. Ink wash splash effects radiate outward from her body like a stone dropped in still water, rendered in the dynamic brushstroke energy of Fog Hill of Five Elements. Mixed-media texture layers: watercolor bleeds, halftone dots, gold leaf flecks, visible paper grain — the multi-style collision of Spider-Verse. Underwater caustic light patterns dance across her skin like in Deep Sea (2023). The composition has the overwhelming sacred geometry beauty of an Outburst cosmic reveal. Wuxia punk masterpiece. Cinematic 16:9, 4K, no text.",
+      "narration": "水面裂开一道缝，一个女孩从九色水里渗出来。",
+      "dialogue": [],
+      "duration_sec": 10,
+      "camera": "zoom_in",
+      "transition": "cut"
+    },
+    {
+      "id": 10,
+      "scene": "睁眼·光碎脸上",
+      "prompt": "Extreme close-up of a 14-year-old Chinese girl's face, eyes just opening for the very first time — pupils adjusting to light, irises catching five colors reflected from water below. Fractured light plays across her face: one cheek gold, the other emerald, forehead cerulean, chin warm amber — each color is a shard of refracted mineral-water light landing on wet skin. Water droplets cling to her eyelashes like tiny prisms. Her expression is the exact moment between confusion and wonder — brows slightly knit, lips parting. Her black hair is plastered wet against her temples, a single strand crossing her nose. Behind her, overexposed clean blue sky bleeds into the frame edges. The lighting is underwater-caustic meeting golden-hour sun — the luminous skin rendering of Deep Sea. Visible ink-wash texture in the shadows under her jaw and hair. Halftone dot pattern subtly visible in the highlight areas like Spider-Verse print texture. Mineral pigment color richness of Dunhuang cave paintings. The intimate emotional intensity of a Makoto Shinkai close-up meets the raw brushwork energy of Fog Hill of Five Elements. Wuxia punk. Cinematic 16:9, 4K, photorealistic with painterly texture overlay, no text.",
+      "narration": "",
+      "dialogue": [{"speaker": "麦洛", "text": "……怪了。", "speed": 0.9}],
+      "duration_sec": 6,
+      "camera": "static",
+      "transition": "cut"
+    },
+    {
+      "id": 27,
+      "scene": "巨眼出现·高潮",
+      "prompt": "MAXIMUM VISUAL IMPACT SPLASH PAGE. The water of the nine-colored pool has parted like curtains pulled by invisible hands, revealing a COLOSSAL VERTICAL PUPIL EYE beneath the surface — each side wider than a human body. The slit pupil flows with five colors: emerald bleeds into amber bleeds into crimson bleeds into indigo bleeds into gold, constantly shifting like liquid opal. The iris is made of concentric rings of ancient geological strata — mineral layers compressed over eons, each ring a different Dunhuang pigment. Around the eye, water hangs frozen mid-splash in impossible shapes, defying gravity — suspended droplets catch light like floating gemstones. The 14-year-old girl stands at the water's edge in silhouette, tiny against the enormous eye, her wet hair dripping, her posture completely still — not afraid, just SEEING. The eye's gaze creates visible light-pressure — rays of five-color light beam outward like a cosmic lighthouse. The entire scene DETONATES with the ink-wash explosion energy of Fog Hill of Five Elements battle climax — flying-white brush strokes slash across the frame. Spider-Verse mixed-media chaos: halftone dots, screen-print misregistration, comic panel border fragments floating in space. The deep-ocean bioluminescent awe of Deep Sea. The geometric cosmic terror-beauty of an Outburst entity manifestation. Cold void black at the edges crushing inward against the blazing five-color center. This is the moment the universe looks back. Wuxia punk at maximum intensity. Cinematic 16:9, 4K, no text.",
+      "narration": "水面退开后露出一只眼睛。每一侧都比她的身体宽。",
+      "dialogue": [],
+      "duration_sec": 12,
+      "camera": "zoom_in",
+      "transition": "smash_cut"
+    },
+    {
+      "id": 50,
+      "scene": "麦洛笑·渊面变色",
+      "prompt": "Wide shot from behind: a 14-year-old Chinese girl sitting at the edge of a vast circular pool, her bare feet dangling in the water, shoulders shaking with laughter. The MOMENT she laughs, a shockwave of warm orange-gold light ERUPTS from where her feet touch the water and races outward in a perfect expanding ring — passing through every color band, transforming each: emerald brightens to spring green, indigo warms to violet, obsidian cracks open with golden veins. The entire nine-colored pool IGNITES for one frame — every color simultaneously at maximum saturation, the water surface becoming a liquid aurora borealis. Her laughter is visible as golden particle-motes rising from her body like fireflies lifting off. A tiny silver-white three-tailed cat creature sits beside her, its fur puffed in startled wonder, amber eyes wide, reflecting the color explosion. Mountains in the background catch the light-pulse and briefly glow translucent, revealing crystalline internal structure. Ink-wash energy lines radiate outward in concentric rings like Fog Hill of Five Elements chi-explosion. Spider-Verse color-separation effect: slight CMYK misregistration on the shockwave edge. The joy-as-cosmic-force visual language of Deep Sea's climactic ocean transformation. Warm, overwhelmingly alive, the opposite of cosmic dread — cosmic LOVE. Wuxia punk meets Ghibli warmth. Cinematic 16:9, 4K, no text.",
+      "narration": "麦洛笑了。整个九色渊亮了一瞬。",
+      "dialogue": [],
+      "duration_sec": 8,
+      "camera": "slow_zoom",
+      "transition": "dissolve"
+    },
+    {
+      "id": 62,
+      "scene": "终章·巨眼重新睁开",
+      "prompt": "Final shot. Underwater perspective looking UP from the deepest point of the abyss. The colossal vertical-pupil eye slowly reopens — but now we see it from INSIDE, from below, as if we are the darkness and the eye is the sky. The five colors in the slit pupil swirl fractionally faster than before — 0.7 percent faster, a change only the universe would notice. Deep within the pupil's darkest center, impossibly small, a new point of light flickers — warm, gold, shaped like a girl's laugh frozen in amber. Water pressure makes everything shimmer and warp. Bioluminescent particles drift upward past the camera like ascending souls. The eye's iris-rings pulse with geological slowness — each pulse sends out a ring of five-color light that illuminates ancient carved symbols on the abyss walls: equations, star maps, musical notation, all in a script that shouldn't exist yet. The very bottom of the frame fades into absolute void-black. The very top blazes with five-color light breaking through water surface far above — a distant heaven seen from the ocean floor. The lonely cosmic grandeur of Sea of Solitude's deepest moments. The patient ancient intelligence of Outburst's cosmic entities. Fog Hill of Five Elements ink-wash water rendering at its most fluid and alive. A single frame that contains an entire mythology. Wuxia punk elegy. Cinematic 16:9, 4K, no text, no watermark.",
+      "narration": "那只眼睛重新睁开了。瞳仁最深处，有一个极小极小的光点——形状像一个女孩的笑。",
+      "dialogue": [],
+      "duration_sec": 10,
+      "camera": "slow_zoom",
+      "transition": "fade_out"
+    }
+  ]
+}
