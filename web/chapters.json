@@ -157,6 +157,48 @@
           { "title": "山海四版本对照", "file": "reference/shanhai_four_versions_master.md", "icon": "🔄", "slug": "shanhai-versions" },
           { "title": "灵感火花集", "file": "reference/sparkles.md", "icon": "✨", "slug": "sparkles" }
         ]
+      },
+      {
+        "title": "🔬 科幻内核",
+        "type": "reference",
+        "items": [
+          { "title": "科幻内核总索引", "file": "reference/scifi_index.md", "icon": "🔬", "slug": "sf-index" },
+          { "title": "三体系列内核", "file": "reference/scifi_three_body.md", "icon": "🌍", "slug": "three-body" },
+          { "title": "基地系列内核", "file": "reference/scifi_foundation.md", "icon": "🏛️", "slug": "foundation" },
+          { "title": "沙丘系列内核", "file": "reference/scifi_dune.md", "icon": "🏜️", "slug": "dune" },
+          { "title": "海伯利安系列", "file": "reference/scifi_hyperion.md", "icon": "⏳", "slug": "hyperion" },
+          { "title": "神经漫游者系列", "file": "reference/scifi_neuromancer.md", "icon": "💻", "slug": "neuromancer" },
+          { "title": "其他经典作品", "file": "reference/scifi_other_classics.md", "icon": "📚", "slug": "sf-other" }
+        ]
+      },
+      {
+        "title": "🎯 经典作品深度分析",
+        "type": "reference",
+        "items": [
+          { "title": "深度分析总览", "file": "reference/masterpiece_index.md", "icon": "🎯", "slug": "masterpiece-analysis" },
+          { "title": "终极裁定", "file": "reference/masterpiece_final_verdict.md", "icon": "⚖️", "slug": "final-verdict" },
+          { "title": "终极裁定V2", "file": "reference/masterpiece_final_verdict_v2.md", "icon": "⚖️", "slug": "final-verdict-v2" },
+          { "title": "四评委裁定", "file": "reference/masterpiece_four_critics.md", "icon": "👨‍⚖️", "slug": "four-critics" },
+          { "title": "差距分析", "file": "reference/masterpiece_gap_analysis.md", "icon": "📊", "slug": "gap-analysis" },
+          { "title": "大师审计V3", "file": "reference/masterpiece_audit_v3.md", "icon": "🔍", "slug": "master-audit" }
+        ]
+      },
+      {
+        "title": "🌟 灵感点子库",
+        "type": "reference",
+        "items": [
+          { "title": "灵感点子库索引", "file": "reference/inspiration_index.md", "icon": "🌟", "slug": "inspiration-index" },
+          { "title": "底层哲学与真相", "file": "reference/inspiration_philosophy.md", "icon": "🌌", "slug": "philosophy-core" },
+          { "title": "第一部灵感集", "file": "reference/inspiration_book1.md", "icon": "🎮", "slug": "book1-ideas" },
+          { "title": "第二部灵感集", "file": "reference/inspiration_book2.md", "icon": "🏙️", "slug": "book2-ideas" },
+          { "title": "第三部灵感集", "file": "reference/inspiration_book3.md", "icon": "⚡", "slug": "book3-ideas" },
+          { "title": "第四部灵感集", "file": "reference/inspiration_book4.md", "icon": "🌠", "slug": "book4-ideas" },
+          { "title": "AGI觉醒与未来", "file": "reference/inspiration_agi_awakening.md", "icon": "🤖", "slug": "agi-awakening" },
+          { "title": "剧情碎片与点子", "file": "reference/inspiration_plot_fragments.md", "icon": "🎬", "slug": "plot-fragments" },
+          { "title": "永恒的终结分析", "file": "reference/inspiration_eternity_analysis.md", "icon": "📖", "slug": "eternity-analysis" },
+          { "title": "早期灵感点滴", "file": "reference/inspiration_early_ideas.md", "icon": "📜", "slug": "early-ideas" },
+          { "title": "创作方法论守则", "file": "reference/inspiration_creation_methodology.md", "icon": "🎯", "slug": "creation-methodology" }
+        ]
       }
     ]
   }
