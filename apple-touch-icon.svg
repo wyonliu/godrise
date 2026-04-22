@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Apple touch icon 180×180 · 全出血无白角·"山"字篆印 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="神临山海">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1d1d1d"/>
+      <stop offset="100%" stop-color="#050505"/>
+    </linearGradient>
+    <linearGradient id="copper2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f5d7a8"/>
+      <stop offset="50%" stop-color="#c88a3a"/>
+      <stop offset="100%" stop-color="#8a5423"/>
+    </linearGradient>
+  </defs>
+  <!-- 全出血背景（iOS 会自动裁圆角·不需要 rx） -->
+  <rect width="180" height="180" fill="url(#bg2)"/>
+  <!-- 铜色内边框 -->
+  <rect x="14" y="14" width="152" height="152" fill="none" stroke="url(#copper2)" stroke-width="2" opacity="0.35"/>
+  <!-- 山字三峰 -->
+  <rect x="34" y="128" width="112" height="9" fill="url(#copper2)"/>
+  <rect x="84" y="38" width="12" height="94" fill="url(#copper2)"/>
+  <rect x="46" y="66" width="8" height="66" fill="url(#copper2)"/>
+  <rect x="126" y="66" width="8" height="66" fill="url(#copper2)"/>
+  <!-- 底部灵机波（0.003 Hz 隐喻） -->
+  <path d="M 28 156 L 62 156 Q 72 156 78 150 Q 84 144 90 144 Q 96 144 102 150 Q 108 156 118 156 L 152 156"
+        fill="none" stroke="url(#copper2)" stroke-width="2.4" opacity="0.7" stroke-linecap="round"/>
+  <!-- 文字标识（大尺寸可读） -->
+  <text x="90" y="22" text-anchor="middle" font-family="'Noto Serif SC', serif"
+        font-size="0" fill="#c88a3a" opacity="0">0.003 Hz</text>
+</svg>

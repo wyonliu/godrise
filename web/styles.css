@@ -32,9 +32,18 @@
     --copper: #d4935c;
     --copper-hover: #e5a972;
     --copper-light: rgba(212, 147, 92, 0.15);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+}
 
 body {
     font-family: var(--font-sans);
@@ -42,7 +51,56 @@ body {
     color: var(--text-primary);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
     overflow: hidden;
+}
+
+/* 无障碍：尊重系统减弱动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* 焦点可见：键盘导航友好 */
+*:focus-visible {
+    outline: 2px solid var(--copper);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* 选中文本配色 */
+::selection {
+    background: var(--copper);
+    color: #fff;
+}
+
+/* 全局滚动条美化（WebKit） */
+.main-content::-webkit-scrollbar,
+.reader-content::-webkit-scrollbar,
+.sidebar::-webkit-scrollbar { width: 8px; height: 8px; }
+.main-content::-webkit-scrollbar-track,
+.reader-content::-webkit-scrollbar-track,
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.main-content::-webkit-scrollbar-thumb,
+.reader-content::-webkit-scrollbar-thumb,
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(184, 115, 51, 0.25);
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+.main-content::-webkit-scrollbar-thumb:hover,
+.reader-content::-webkit-scrollbar-thumb:hover,
+.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(184, 115, 51, 0.55); }
+
+/* 主题切换平滑过渡 */
+body, .unified-header, .sidebar, .reader-content, .book-page, .entry-card, .saga-step, .hero-stats {
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
 }
 
 .app-container {
@@ -107,6 +165,17 @@ body {
     display: flex;
     gap: 2rem;
     justify-content: center;
+    flex-wrap: nowrap;
+    min-width: 0;
+}
+
+/* 中等屏（1024–1280px）: 收窄 nav 避免挤压 6 个链接 */
+@media (max-width: 1280px) {
+    .header-nav { gap: 1rem; }
+    .nav-link { padding: 0.75rem 0.5rem; font-size: 0.8rem; }
+}
+@media (max-width: 1100px) {
+    .nav-link { padding: 0.5rem 0.35rem; font-size: 0.75rem; letter-spacing: 0; }
 }
 
 .nav-link {
@@ -451,26 +520,47 @@ body {
 }
 
 .book-page {
-    max-width: 720px;
+    max-width: 920px;
     margin: 0 auto;
-    margin-right: calc(50% - 360px + 120px); /* 向左偏移120px，给右侧TOC留空间 */
-    margin-left: calc(50% - 360px - 120px);
+    margin-right: calc(50% - 460px + 120px); /* 向左偏移120px，给右侧TOC留空间 */
+    margin-left: calc(50% - 460px - 120px);
     background: var(--bg-paper);
-    padding: 3rem 4rem;
+    padding: 3rem 4.5rem;
     box-shadow: var(--shadow-md);
     min-height: calc(100vh - var(--header-height) - var(--footer-height));
     position: relative;
 }
 
+/* 正文图片自适应 + 离屏跳渲染（长文多图提速） */
+.book-page img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 1.5rem auto;
+    border-radius: 4px;
+    box-shadow: var(--shadow-sm, 0 2px 8px rgba(0,0,0,0.08));
+    content-visibility: auto;
+    contain-intrinsic-size: 800px 500px;
+}
+
+@media (max-width: 1600px) {
+    .book-page {
+        margin-right: calc(50% - 460px + 80px);
+        margin-left: calc(50% - 460px - 80px);
+    }
+}
+
 @media (max-width: 1400px) {
     .book-page {
-        margin-right: calc(50% - 360px + 80px);
-        margin-left: calc(50% - 360px - 80px);
+        max-width: 820px;
+        margin-right: calc(50% - 410px + 60px);
+        margin-left: calc(50% - 410px - 60px);
     }
 }
 
 @media (max-width: 1200px) {
     .book-page {
+        max-width: 760px;
         margin: 0 auto; /* 屏幕较小时恢复居中 */
     }
 }
@@ -554,54 +644,72 @@ body {
 }
 
 #content h1 {
-    font-size: 1.625rem; /* Smaller H1 */
-    text-align: center;
-    margin: 0 0 2rem 0;
-    color: var(--copper);
+    font-size: 1.4rem;
+    text-align: left;
+    margin: 0.25rem 0 1.5rem 0;
+    color: var(--text-primary);
     border-bottom: 1px solid var(--border);
-    padding-bottom: 0.875rem;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    scroll-margin-top: 100px; /* 为锚点跳转留出空间 */
-    transition: background-color 0.3s ease; /* 锚点高亮过渡 */
+    padding-bottom: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    line-height: 1.35;
+    scroll-margin-top: 100px;
+    transition: background-color 0.3s ease;
+    font-feature-settings: 'palt' 1, 'kern' 1;
+}
+
+/* 去除 markdown 标题里 emoji 的"傻大黑"感 */
+#content h1 .emoji,
+#content h2 .emoji,
+#content h3 .emoji {
+    font-size: 0.85em;
+    opacity: 0.75;
+    margin-right: 0.3em;
+    vertical-align: -0.05em;
 }
 
 #content h2 {
-    font-size: 1.125rem; /* Smaller H2 */
-    margin: 2rem 0 0.875rem;
+    font-size: 1.08rem;
+    margin: 2rem 0 0.75rem;
     color: var(--copper);
-    font-weight: 500;
-    padding-top: 0.5rem;
+    font-weight: 600;
+    padding-top: 0.4rem;
+    letter-spacing: 0.02em;
     scroll-margin-top: 100px;
     transition: background-color 0.3s ease;
 }
 
 #content h3 {
-    font-size: 1rem; /* Smaller H3 */
-    margin: 1.5rem 0 0.75rem;
+    font-size: 0.98rem;
+    margin: 1.4rem 0 0.6rem;
     color: var(--text-primary);
-    font-weight: 500;
+    font-weight: 600;
     scroll-margin-top: 100px;
     transition: background-color 0.3s ease;
 }
 
 #content p {
-    margin-bottom: 1.1em; /* Tighter paragraph spacing */
+    margin-bottom: 1.05em;
     text-indent: 2em;
     line-height: 1.75;
 }
 
-#content p:first-of-type {
+/* 仅正文章节（不是设定/百科）显示首字下沉 */
+#content .chapter-content.is-novel p:first-of-type {
     text-indent: 0;
 }
-
-#content p:first-of-type::first-letter {
-    font-size: 2.5em; /* Smaller drop cap */
+#content .chapter-content.is-novel p:first-of-type::first-letter {
+    font-size: 2.4em;
     float: left;
     line-height: 0.85;
     margin: 0.05em 0.08em 0 0;
     color: var(--copper);
     font-weight: 600;
+}
+
+/* 其他页面首段正常处理 */
+#content p:first-of-type {
+    text-indent: 0;
 }
 
 #content blockquote {
@@ -1362,32 +1470,240 @@ body {
 }
 
 /* ========== 欢迎页面 ========== */
-.welcome-screen {
+/* ============ 旧欢迎屏兼容（保留最小样式） ============ */
+.welcome-screen { text-align: center; padding: 4rem 2rem; }
+.welcome-screen h2 { font-family: var(--font-serif); font-size: 1.875rem; margin-bottom: 1.25rem; color: var(--copper); font-weight: 500; }
+.intro-text { font-size: 0.9375rem; color: var(--text-secondary); margin-bottom: 2.75rem; }
+
+/* ============ v50 首页 Hero · 欢迎屏 ============ */
+.welcome-hero {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 3rem;
+    animation: heroFadeIn 0.9s ease-out both;
+}
+
+@keyframes heroFadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-brand {
     text-align: center;
-    padding: 4rem 2rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid rgba(184, 115, 51, 0.15);
+    margin-bottom: 3rem;
 }
 
-.welcome-screen h2 {
-    font-family: var(--font-serif);
-    font-size: 1.875rem;
-    margin-bottom: 1.25rem;
+.hero-eyebrow {
+    font-size: 0.78rem;
+    letter-spacing: 0.35em;
     color: var(--copper);
+    text-transform: uppercase;
+    margin-bottom: 1.1rem;
+    opacity: 0.85;
+}
+
+.hero-title {
+    font-family: var(--font-serif);
+    font-size: clamp(2.8rem, 6vw, 4.6rem);
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    color: var(--text-primary);
+    margin: 0 0 1rem;
+    background: linear-gradient(135deg, var(--copper) 0%, #e0aa70 50%, var(--copper) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.1;
+}
+
+.hero-thesis {
+    font-family: var(--font-serif);
+    font-size: clamp(1.1rem, 2.2vw, 1.5rem);
     font-weight: 500;
+    letter-spacing: 0.2em;
+    color: var(--text-primary);
+    margin: 0 0 0.85rem;
 }
 
-.intro-text {
-    font-size: 0.9375rem;
+.hero-tagline {
+    font-size: 0.92rem;
     color: var(--text-secondary);
-    margin-bottom: 2.75rem;
+    line-height: 1.75;
+    margin: 0;
+    letter-spacing: 0.04em;
 }
 
+/* 四部曲时间轴 */
+.hero-saga {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.9rem;
+    margin: 0 0 3rem;
+    position: relative;
+}
+.hero-saga::before {
+    content: '';
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    top: 50%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(184, 115, 51, 0.35) 15%, rgba(184, 115, 51, 0.35) 85%, transparent 100%);
+    z-index: 0;
+}
+
+.saga-step {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 1.1rem 0.6rem;
+    background: var(--bg-paper);
+    border: 1px solid rgba(184, 115, 51, 0.18);
+    border-radius: 14px;
+    transition: all 0.35s ease;
+    cursor: default;
+}
+.saga-step:hover {
+    transform: translateY(-3px);
+    border-color: var(--copper);
+    box-shadow: 0 8px 24px -8px rgba(184, 115, 51, 0.35);
+}
+
+.saga-idx {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    color: var(--copper);
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 0.45rem;
+}
+.saga-name {
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    color: var(--text-primary);
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.3rem;
+}
+.saga-span {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    font-variant-numeric: tabular-nums;
+}
+
+/* 快速入口四卡 */
+.hero-entries {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.9rem;
+    margin: 0 0 2.75rem;
+}
+
+.entry-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    padding: 1.4rem 1rem;
+    background: var(--bg-paper);
+    border: 1px solid rgba(184, 115, 51, 0.15);
+    border-radius: 14px;
+    text-align: center;
+    transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+.entry-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 30%, var(--copper-light) 100%);
+    opacity: 0;
+    transition: opacity 0.35s;
+    pointer-events: none;
+}
+.entry-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--copper);
+    box-shadow: 0 12px 32px -10px rgba(184, 115, 51, 0.35);
+    color: inherit;
+}
+.entry-card:hover::before { opacity: 1; }
+
+.entry-icon {
+    font-size: 1.7rem;
+    margin-bottom: 0.5rem;
+    line-height: 1;
+}
+.entry-head {
+    font-family: var(--font-serif);
+    font-size: 1.08rem;
+    font-weight: 500;
+    color: var(--copper);
+    letter-spacing: 0.12em;
+    margin-bottom: 0.45rem;
+}
+.entry-desc {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+}
+
+/* 数据看板 */
+.hero-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.9rem;
+    padding: 1.5rem;
+    background: linear-gradient(180deg, var(--copper-light) 0%, transparent 100%);
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+}
+
+.hero-stats .stat-item {
+    text-align: center;
+    padding: 0.6rem 0.4rem;
+    background: transparent;
+    border-radius: 0;
+    transition: none;
+}
+.hero-stats .stat-item:hover { transform: none; }
+
+.hero-stats .stat-val {
+    font-family: var(--font-serif);
+    font-size: clamp(1.5rem, 3vw, 2.1rem);
+    font-weight: 700;
+    color: var(--copper);
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+}
+.hero-stats .stat-label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 0.35rem;
+    letter-spacing: 0.08em;
+}
+
+.hero-footnote {
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    padding-top: 0.3rem;
+}
+
+/* ============ 兼容旧 stats-grid（互动中心等仍在用） ============ */
 .stats-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.75rem;
     margin: 2.5rem 0;
 }
-
 .stat-item {
     text-align: center;
     padding: 1.75rem;
@@ -1395,18 +1711,13 @@ body {
     border-radius: 12px;
     transition: transform 0.3s;
 }
-
-.stat-item:hover {
-    transform: translateY(-4px);
-}
-
+.stat-item:hover { transform: translateY(-4px); }
 .stat-val {
     font-size: 1.875rem;
     font-weight: 700;
     color: var(--copper);
     font-family: var(--font-serif);
 }
-
 .stat-label {
     font-size: 0.8125rem;
     color: var(--text-muted);
@@ -2000,6 +2311,16 @@ body {
     .tabbar-item span { font-size: 0.6rem; font-weight: 500; }
     .tabbar-item svg { width: 22px; height: 22px; }
     .tabbar-item:active, .tabbar-item.active { color: var(--copper); }
+}
+
+/* 极窄屏（< 380px，iPhone SE 1st gen 等）: tabbar 5 项收紧防溢出 */
+@media (max-width: 379px) {
+    .tabbar-item { padding: 0 !important; gap: 1px !important; }
+    .tabbar-item span { font-size: 0.55rem !important; }
+    .tabbar-item svg { width: 18px !important; height: 18px !important; }
+}
+
+@media (max-width: 768px) {
 
     /* ── Mobile search bar (slides down from top) ── */
     .mobile-search-bar {
@@ -2075,3 +2396,1595 @@ body {
     .book-page { padding: 1.5rem 1rem; }
     #content { font-size: 15px; line-height: 1.9; }
 }
+
+/* ============ v50 Hero 响应式 ============ */
+@media (max-width: 880px) {
+    .welcome-hero { padding: 2.5rem 1rem 2rem; }
+    .hero-title { letter-spacing: 0.22em; }
+    .hero-thesis { letter-spacing: 0.15em; }
+    .hero-saga { grid-template-columns: repeat(2, 1fr); gap: 0.7rem; }
+    .hero-saga::before { display: none; }
+    .hero-entries { grid-template-columns: repeat(2, 1fr); gap: 0.7rem; }
+    .hero-stats { grid-template-columns: repeat(2, 1fr); gap: 0.7rem; padding: 1rem; }
+    .hero-stats .stat-val { font-size: 1.5rem; }
+}
+@media (max-width: 480px) {
+    .welcome-hero { padding: 1.8rem 0.85rem 1.5rem; }
+    .hero-eyebrow { font-size: 0.68rem; letter-spacing: 0.28em; }
+    .hero-tagline { font-size: 0.82rem; }
+    .saga-idx { font-size: 1.15rem; }
+    .saga-name { font-size: 0.9rem; }
+    .saga-span { font-size: 0.68rem; }
+    .entry-icon { font-size: 1.45rem; }
+    .entry-head { font-size: 0.95rem; letter-spacing: 0.1em; }
+    .entry-desc { font-size: 0.7rem; }
+    .hero-stats .stat-val { font-size: 1.3rem; }
+    .hero-stats .stat-label { font-size: 0.7rem; }
+}
+
+/* ============ v51 Hero 硬核钩子 ============ */
+.hero-hooks {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.9rem;
+    margin: 2rem 0 2.25rem;
+}
+.hook-card {
+    position: relative;
+    padding: 1.15rem 1.1rem 1rem 3rem;
+    background: var(--bg-paper);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--copper);
+    border-radius: 4px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.hook-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-left-color: var(--copper-hover);
+}
+.hook-num {
+    position: absolute;
+    left: 1rem;
+    top: 1.05rem;
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--copper);
+    letter-spacing: 0.08em;
+    opacity: 0.55;
+    font-variant-numeric: tabular-nums;
+}
+.hook-head {
+    font-family: var(--font-serif);
+    font-size: 1.02rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.04em;
+    margin-bottom: 0.55rem;
+}
+.hook-body {
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    font-family: var(--font-serif);
+}
+.hook-body code {
+    display: inline-block;
+    padding: 0.05em 0.4em;
+    margin: 0 0.1em;
+    background: var(--copper-light);
+    color: var(--copper);
+    border-radius: 3px;
+    font-family: 'SF Mono', Monaco, Menlo, 'Courier New', monospace;
+    font-size: 0.82em;
+    white-space: nowrap;
+}
+.hook-body b {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Saga 小标题 */
+.hero-saga-head {
+    text-align: center;
+    font-family: var(--font-serif);
+    font-size: 0.85rem;
+    letter-spacing: 0.35em;
+    color: var(--text-muted);
+    margin: 0.25rem 0 1rem;
+    padding-left: 0.35em;
+}
+.saga-hint {
+    margin-top: 0.35rem;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+    line-height: 1.4;
+}
+
+/* 五卡入口：5 列 */
+.hero-entries {
+    grid-template-columns: repeat(5, 1fr) !important;
+}
+
+/* 作者名片 */
+.hero-author {
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-family: var(--font-serif);
+}
+.hero-author-line {
+    font-size: 0.95rem;
+    color: var(--copper);
+    letter-spacing: 0.22em;
+    font-weight: 600;
+}
+.hero-author-sub {
+    margin-top: 0.35rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+}
+
+/* 面包屑 chapter-info-inline 内部细化 */
+.crumb-book, .crumb-section {
+    color: var(--copper);
+    font-style: normal;
+    letter-spacing: 0.02em;
+}
+.crumb-sep {
+    margin: 0 0.4em;
+    opacity: 0.5;
+    font-style: normal;
+}
+.crumb-item {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* ============ v51 Hero 响应式 ============ */
+@media (max-width: 880px) {
+    .hero-hooks { grid-template-columns: 1fr; gap: 0.7rem; }
+    .hero-entries { grid-template-columns: repeat(2, 1fr) !important; }
+    .hook-card { padding: 1rem 1rem 0.9rem 2.6rem; }
+    .hook-num { top: 0.95rem; left: 0.85rem; font-size: 0.85rem; }
+    .hook-head { font-size: 0.95rem; }
+    .hook-body { font-size: 0.82rem; }
+    .hero-saga-head { font-size: 0.75rem; letter-spacing: 0.28em; }
+    .saga-hint { font-size: 0.65rem; }
+    .hero-author-sub { font-size: 0.7rem; }
+}
+@media (max-width: 480px) {
+    .hero-hooks { gap: 0.55rem; margin: 1.4rem 0 1.6rem; }
+    .hero-entries { grid-template-columns: 1fr !important; }
+    .hook-card { padding: 0.9rem 0.85rem 0.8rem 2.4rem; border-left-width: 2px; }
+    .hero-author-line { font-size: 0.85rem; letter-spacing: 0.18em; }
+}
+
+/* ============ v52 Sidebar 折叠（桌面端丝滑收起） ============ */
+body.sidebar-collapsed .sidebar {
+    transform: translateX(calc(-1 * var(--sidebar-width)));
+    box-shadow: none;
+    opacity: 0.0;
+    pointer-events: none;
+}
+body.sidebar-collapsed .main-content {
+    margin-left: 0;
+    transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+body.sidebar-collapsed .reading-progress {
+    left: 0;
+    transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+body:not(.sidebar-collapsed) .main-content,
+body:not(.sidebar-collapsed) .reading-progress {
+    transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sidebar {
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.3s ease;
+    will-change: transform;
+}
+
+.sidebar-toggle-btn.collapsed {
+    color: var(--copper);
+    background: var(--copper-light);
+}
+.sidebar-toggle-btn svg {
+    transition: transform 0.3s ease;
+}
+.sidebar-toggle-btn.collapsed svg {
+    transform: rotate(90deg);
+}
+/* 移动端隐藏桌面端折叠按钮 */
+@media (max-width: 1024px) {
+    .sidebar-toggle-btn { display: none; }
+}
+
+/* ============ v52 首页大标题 + 两段硬核介绍 ============ */
+.hero-title {
+    font-size: clamp(2.8rem, 7vw, 4.6rem) !important;
+    letter-spacing: 0.14em !important;
+    font-weight: 700 !important;
+    line-height: 1.05 !important;
+    margin: 0.2rem 0 0.85rem !important;
+}
+
+.hero-intro {
+    max-width: 760px;
+    margin: 1.5rem auto 2rem;
+    padding: 0 0.5rem;
+}
+.hero-intro-p {
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    line-height: 1.95;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+    text-align: justify;
+    margin-bottom: 1.15em;
+}
+.hero-intro-p:last-child { margin-bottom: 0; }
+.hero-intro-p b {
+    font-weight: 700;
+    color: var(--copper);
+}
+.hero-intro-p em {
+    font-style: normal;
+    color: var(--text-secondary);
+    background: linear-gradient(transparent 65%, var(--copper-light) 65%);
+    padding: 0 0.15em;
+}
+
+@media (max-width: 880px) {
+    .hero-intro { margin: 1.1rem auto 1.5rem; }
+    .hero-intro-p { font-size: 0.92rem; line-height: 1.85; }
+}
+@media (max-width: 480px) {
+    .hero-intro-p { font-size: 0.88rem; line-height: 1.8; text-align: left; }
+}
+
+/* ============ v52 搜索标签页 + 流式 ============ */
+.search-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.search-tabs {
+    display: flex;
+    gap: 0.25rem;
+    background: var(--bg-main);
+    border-radius: 6px;
+    padding: 2px;
+}
+.search-tab {
+    border: none;
+    background: transparent;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-family: var(--font-sans);
+    letter-spacing: 0.04em;
+}
+.search-tab:hover { color: var(--copper); }
+.search-tab.active {
+    background: var(--bg-paper);
+    color: var(--copper);
+    font-weight: 600;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+.search-stream-status {
+    flex: 1;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+}
+.search-stream-status.done { color: var(--copper); }
+
+/* 流式结果单项 fade-in */
+.search-result-group {
+    animation: resultFadeIn 0.25s ease both;
+}
+@keyframes resultFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============ v52 面包屑 hover-back 返回箭头 ============ */
+.crumb-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--copper);
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+    font-style: normal;
+    font-family: var(--font-sans);
+    letter-spacing: 0.04em;
+    text-decoration: none;
+}
+.crumb-back:hover { background: var(--copper-light); }
+.crumb-back::before { content: '‹'; font-size: 1.1em; line-height: 1; }
+
+/* Header brand 可点标识 */
+.header-brand { cursor: pointer; }
+.header-brand .main-title { transition: color 0.2s ease, transform 0.2s ease; }
+.header-brand:hover .main-subtitle { color: var(--copper); }
+
+/* ============================================================
+   v53 · Hero 升级：克制的高级 · 硬核数据墙 · 命题卡
+   - 覆盖/补充 v51-v52 的 .hero-* 规则
+   - 不动侧边栏/搜索/目录等结构
+   ============================================================ */
+
+.welcome-hero.v53 {
+    max-width: 1040px;
+    padding: 5rem 1.6rem 4rem;
+}
+
+/* 首屏分层渐进淡入 */
+.welcome-hero.v53 > * {
+    animation: v53Rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.welcome-hero.v53 > *:nth-child(1) { animation-delay: 0.00s; }
+.welcome-hero.v53 > *:nth-child(2) { animation-delay: 0.08s; }
+.welcome-hero.v53 > *:nth-child(3) { animation-delay: 0.16s; }
+.welcome-hero.v53 > *:nth-child(4) { animation-delay: 0.24s; }
+.welcome-hero.v53 > *:nth-child(5) { animation-delay: 0.30s; }
+.welcome-hero.v53 > *:nth-child(6) { animation-delay: 0.36s; }
+.welcome-hero.v53 > *:nth-child(7) { animation-delay: 0.42s; }
+.welcome-hero.v53 > *:nth-child(n+8) { animation-delay: 0.48s; }
+
+@keyframes v53Rise {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- 1. 品牌区 ---------- */
+.welcome-hero.v53 .hero-brand {
+    text-align: center;
+    padding-bottom: 0;
+    border-bottom: none;
+    margin-bottom: 3rem;
+}
+
+.welcome-hero.v53 .hero-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.42em;
+    color: var(--copper);
+    opacity: 0.8;
+    margin-bottom: 1.6rem;
+    text-transform: none;
+    font-family: var(--font-serif);
+}
+
+.welcome-hero.v53 .hero-title {
+    font-size: clamp(3.2rem, 8vw, 5.4rem) !important;
+    letter-spacing: 0.18em !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    margin: 0 0 1.1rem !important;
+    /* 双层 text-shadow 制造轻微铜色辉光，不用图片 */
+    text-shadow:
+        0 0 24px rgba(184, 115, 51, 0.18),
+        0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.welcome-hero.v53 .hero-slogan {
+    font-family: var(--font-serif);
+    font-size: clamp(1.15rem, 2.4vw, 1.55rem);
+    font-weight: 500;
+    color: var(--text-primary);
+    letter-spacing: 0.14em;
+    margin: 0 0 1.35rem;
+    line-height: 1.5;
+}
+
+.welcome-hero.v53 .hero-brand-rule {
+    width: 42px;
+    height: 1px;
+    margin: 0 auto 1.1rem;
+    background: linear-gradient(90deg, transparent, var(--copper), transparent);
+    opacity: 0.6;
+}
+
+.welcome-hero.v53 .hero-thesis-sub {
+    font-family: var(--font-serif);
+    font-size: 0.92rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.16em;
+    margin: 0;
+    opacity: 0.9;
+}
+
+/* ---------- 2. 尺度墙 ---------- */
+.welcome-hero.v53 .hero-scale {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0;
+    margin: 0 0 3.2rem;
+    padding: 1.6rem 0.3rem;
+    border-top: 1px solid rgba(184, 115, 51, 0.18);
+    border-bottom: 1px solid rgba(184, 115, 51, 0.18);
+    position: relative;
+}
+.welcome-hero.v53 .hero-scale::before,
+.welcome-hero.v53 .hero-scale::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(184, 115, 51, 0.35), transparent);
+    opacity: 0.5;
+}
+.welcome-hero.v53 .hero-scale::before { top: -1px; }
+.welcome-hero.v53 .hero-scale::after { bottom: -1px; }
+
+.welcome-hero.v53 .scale-cell {
+    text-align: center;
+    padding: 0.2rem 0.4rem;
+    position: relative;
+}
+.welcome-hero.v53 .scale-cell + .scale-cell::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 18%; bottom: 18%;
+    width: 1px;
+    background: rgba(184, 115, 51, 0.16);
+}
+
+.welcome-hero.v53 .scale-num {
+    font-family: var(--font-serif);
+    font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+    font-weight: 700;
+    color: var(--copper);
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+}
+.welcome-hero.v53 .scale-num .suffix {
+    font-size: 0.55em;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-left: 0.12em;
+    letter-spacing: 0.04em;
+}
+.welcome-hero.v53 .scale-label {
+    margin-top: 0.5rem;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    letter-spacing: 0.14em;
+    line-height: 1.5;
+}
+
+/* ---------- 3. 硬核介绍 ---------- */
+.welcome-hero.v53 .hero-intro {
+    max-width: 760px;
+    margin: 0 auto 2.2rem;
+    padding: 0 0.5rem;
+}
+.welcome-hero.v53 .hero-intro-p {
+    font-family: var(--font-serif);
+    font-size: 1.02rem;
+    line-height: 2;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+    text-align: justify;
+    margin-bottom: 1.3em;
+}
+.welcome-hero.v53 .hero-intro-p:last-child { margin-bottom: 0; }
+.welcome-hero.v53 .hero-intro-p b {
+    font-weight: 700;
+    color: var(--copper);
+}
+.welcome-hero.v53 .hero-intro-p em {
+    font-style: normal;
+    color: var(--text-primary);
+    background: linear-gradient(transparent 68%, var(--copper-light) 68%);
+    padding: 0 0.12em;
+}
+
+/* 首段首字放大 */
+.welcome-hero.v53 .hero-lead .drop {
+    float: left;
+    font-family: var(--font-serif);
+    font-size: 2.9em;
+    line-height: 0.9;
+    font-weight: 700;
+    color: var(--copper);
+    margin: 0.12em 0.18em -0.05em 0;
+    background: linear-gradient(135deg, var(--copper) 0%, #e0aa70 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* ---------- 4. 对比条 ---------- */
+.welcome-hero.v53 .hero-contrast {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem 0.85rem;
+    margin: 0 auto 3.2rem;
+    padding: 1rem 1.2rem;
+    max-width: 820px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, rgba(184, 115, 51, 0.035) 0%, transparent 100%);
+}
+.welcome-hero.v53 .contrast-not {
+    font-family: var(--font-serif);
+    font-size: 0.84rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    padding: 0.15rem 0.55rem;
+    text-decoration: line-through;
+    text-decoration-color: rgba(184, 115, 51, 0.45);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+}
+.welcome-hero.v53 .contrast-is {
+    font-family: var(--font-serif);
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    letter-spacing: 0.06em;
+    padding: 0.15rem 0.8rem;
+    border-left: 2px solid var(--copper);
+    margin-left: 0.25rem;
+}
+
+/* ---------- 5. 四部曲 saga ---------- */
+.welcome-hero.v53 .hero-saga-head,
+.welcome-hero.v53 .hero-entries-head {
+    text-align: center;
+    font-family: var(--font-serif);
+    font-size: 0.78rem;
+    letter-spacing: 0.42em;
+    color: var(--text-muted);
+    margin: 0 0 1.5rem;
+    position: relative;
+}
+.welcome-hero.v53 .hero-saga-head::before,
+.welcome-hero.v53 .hero-saga-head::after,
+.welcome-hero.v53 .hero-entries-head::before,
+.welcome-hero.v53 .hero-entries-head::after {
+    content: '';
+    display: inline-block;
+    width: 28px;
+    height: 1px;
+    vertical-align: middle;
+    background: rgba(184, 115, 51, 0.35);
+    margin: 0 1rem;
+}
+
+.welcome-hero.v53 .hero-saga {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin: 0 0 3.4rem;
+}
+.welcome-hero.v53 .hero-saga::before { display: none; }
+
+.welcome-hero.v53 .saga-step {
+    padding: 1.5rem 1rem 1.3rem;
+    background: var(--bg-paper);
+    border: 1px solid rgba(184, 115, 51, 0.16);
+    border-radius: 12px;
+    text-align: center;
+    cursor: default;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.35s ease,
+                box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    overflow: hidden;
+}
+.welcome-hero.v53 .saga-step::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, var(--copper-light) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+}
+.welcome-hero.v53 .saga-step:hover {
+    transform: translateY(-4px);
+    border-color: var(--copper);
+    box-shadow: 0 16px 40px -16px rgba(184, 115, 51, 0.4);
+}
+.welcome-hero.v53 .saga-step:hover::before { opacity: 1; }
+
+.welcome-hero.v53 .saga-idx {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    color: var(--copper);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.6rem;
+    opacity: 0.9;
+}
+.welcome-hero.v53 .saga-name {
+    font-family: var(--font-serif);
+    font-size: 1.18rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.18em;
+    margin-bottom: 0.45rem;
+}
+.welcome-hero.v53 .saga-span {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 0.85rem;
+}
+.welcome-hero.v53 .saga-thesis {
+    font-family: var(--font-serif);
+    font-size: 0.92rem;
+    color: var(--text-primary);
+    letter-spacing: 0.04em;
+    line-height: 1.55;
+    margin-bottom: 0.55rem;
+    min-height: 2.8em;
+}
+.welcome-hero.v53 .saga-hint {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    line-height: 1.5;
+    padding-top: 0.6rem;
+    border-top: 1px dashed rgba(184, 115, 51, 0.18);
+}
+
+/* ---------- 6. 入口卡 ---------- */
+.welcome-hero.v53 .hero-entries {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin: 0 0 3rem;
+}
+.welcome-hero.v53 .entry-card {
+    padding: 1.9rem 1rem 1.6rem;
+    background: var(--bg-paper);
+    border: 1px solid rgba(184, 115, 51, 0.16);
+    border-radius: 12px;
+    text-align: center;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.35s ease,
+                box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    overflow: hidden;
+}
+.welcome-hero.v53 .entry-card::before {
+    background: radial-gradient(circle at 50% 100%, var(--copper-light) 0%, transparent 55%);
+}
+.welcome-hero.v53 .entry-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--copper);
+    box-shadow: 0 18px 44px -16px rgba(184, 115, 51, 0.4);
+}
+
+.welcome-hero.v53 .entry-glyph {
+    font-family: var(--font-serif);
+    font-size: 1.45rem;
+    color: var(--copper);
+    margin-bottom: 0.6rem;
+    line-height: 1;
+    opacity: 0.85;
+    letter-spacing: 0;
+}
+.welcome-hero.v53 .entry-head {
+    font-family: var(--font-serif);
+    font-size: 1.08rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.18em;
+    margin-bottom: 0.45rem;
+}
+.welcome-hero.v53 .entry-desc {
+    font-size: 0.76rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    letter-spacing: 0.04em;
+}
+
+/* ---------- 7. 兼容旧统计（隐藏但保留 DOM 供 updateStats 写入） ---------- */
+.welcome-hero.v53 .legacy-stats {
+    display: none !important;
+}
+
+/* ---------- 8. 作者区 ---------- */
+.welcome-hero.v53 .hero-author {
+    text-align: center;
+    padding-top: 2rem;
+    margin-top: 1rem;
+    border-top: 1px solid rgba(184, 115, 51, 0.12);
+}
+.welcome-hero.v53 .hero-author-line {
+    font-family: var(--font-serif);
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    letter-spacing: 0.22em;
+    margin-bottom: 0.4rem;
+}
+.welcome-hero.v53 .hero-author-sub {
+    font-size: 0.74rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    line-height: 1.7;
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 1024px) {
+    .welcome-hero.v53 { padding: 4rem 1.3rem 3rem; }
+    .welcome-hero.v53 .hero-scale { grid-template-columns: repeat(3, 1fr); gap: 1rem 0; padding: 1.4rem 0.3rem; }
+    .welcome-hero.v53 .scale-cell:nth-child(3n+1)::before { display: none; }
+    .welcome-hero.v53 .hero-saga { grid-template-columns: repeat(2, 1fr); }
+    .welcome-hero.v53 .hero-entries { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+    .welcome-hero.v53 { padding: 3rem 1rem 2.4rem; }
+    .welcome-hero.v53 .hero-title { letter-spacing: 0.14em !important; }
+    .welcome-hero.v53 .hero-slogan { font-size: 1.05rem; letter-spacing: 0.1em; }
+    .welcome-hero.v53 .hero-scale { grid-template-columns: repeat(2, 1fr); gap: 1.1rem 0; }
+    .welcome-hero.v53 .scale-cell::before { display: none !important; }
+    .welcome-hero.v53 .scale-cell:nth-child(2n+1) { border-right: 1px solid rgba(184, 115, 51, 0.16); }
+    .welcome-hero.v53 .hero-intro-p { font-size: 0.94rem; line-height: 1.9; }
+    .welcome-hero.v53 .hero-lead .drop { font-size: 2.4em; }
+    .welcome-hero.v53 .hero-contrast { gap: 0.4rem 0.55rem; padding: 0.85rem 0.9rem; }
+    .welcome-hero.v53 .contrast-not { font-size: 0.78rem; }
+    .welcome-hero.v53 .contrast-is { font-size: 0.82rem; padding-left: 0.65rem; border-left-width: 2px; width: 100%; text-align: center; border-left: none; border-top: 1px solid rgba(184, 115, 51, 0.25); padding-top: 0.6rem; margin-top: 0.3rem; margin-left: 0; }
+    .welcome-hero.v53 .hero-saga-head::before,
+    .welcome-hero.v53 .hero-saga-head::after,
+    .welcome-hero.v53 .hero-entries-head::before,
+    .welcome-hero.v53 .hero-entries-head::after { width: 18px; margin: 0 0.5rem; }
+    .welcome-hero.v53 .saga-thesis { min-height: 0; }
+}
+@media (max-width: 420px) {
+    .welcome-hero.v53 .hero-saga { grid-template-columns: 1fr; }
+    .welcome-hero.v53 .hero-entries { grid-template-columns: 1fr; }
+}
+
+/* 深色模式微调 */
+[data-theme="dark"] .welcome-hero.v53 .hero-title {
+    text-shadow: 0 0 28px rgba(212, 147, 92, 0.22);
+}
+[data-theme="dark"] .welcome-hero.v53 .contrast-not {
+    text-decoration-color: rgba(212, 147, 92, 0.55);
+}
+
+/* ============================================================
+   v54 · Hero 克制重排（覆盖 v53）
+   审美方向：书的扉页，不是广告牌
+   - 字号全面下调，层级清晰：一个大标题 + 多层小字
+   - 更多留白，铜色克制
+   - 正文 serif，行距舒展，像翻开一本书
+   ============================================================ */
+
+/* 更多留白 */
+.welcome-hero.v54 {
+    max-width: 880px;
+    padding: 6.5rem 1.8rem 5rem;
+}
+
+/* ---------- 品牌区：主标题收缩 · slogan 退为小字副题 ---------- */
+.welcome-hero.v54 .hero-brand {
+    margin-bottom: 3.6rem;
+}
+
+.welcome-hero.v54 .hero-eyebrow {
+    font-size: 0.66rem;
+    letter-spacing: 0.48em;
+    opacity: 0.7;
+    margin-bottom: 1.8rem;
+}
+
+.welcome-hero.v54 .hero-title {
+    font-size: clamp(2.6rem, 5.4vw, 3.6rem) !important;
+    letter-spacing: 0.22em !important;
+    font-weight: 600 !important;
+    margin: 0 0 1.25rem !important;
+    text-shadow:
+        0 0 18px rgba(184, 115, 51, 0.12),
+        0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* slogan 退为低调小字，不再是金句碑 */
+.welcome-hero.v54 .hero-slogan {
+    font-size: 1.05rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    letter-spacing: 0.12em;
+    margin: 0 0 1.2rem;
+    line-height: 1.5;
+    opacity: 0.92;
+}
+
+.welcome-hero.v54 .hero-brand-rule {
+    width: 36px;
+    opacity: 0.5;
+    margin-bottom: 0;
+}
+
+/* ---------- 硬核介绍：正文 serif 书感 ---------- */
+.welcome-hero.v54 .hero-intro {
+    max-width: 680px;
+    margin: 0 auto 3.8rem;
+}
+
+.welcome-hero.v54 .hero-intro-p {
+    font-size: 0.98rem;
+    line-height: 1.95;
+    color: var(--text-primary);
+    letter-spacing: 0.015em;
+    margin-bottom: 1.5em;
+    text-align: justify;
+}
+
+/* 彻底不用 bold 铜色/高亮块 —— 让文字自身说话 */
+.welcome-hero.v54 .hero-intro-p b {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+/* em 只做最轻微强调：一点 italic + 微铜色，像书里的引用 */
+.welcome-hero.v54 .hero-intro-p em {
+    font-style: italic;
+    color: var(--copper);
+    background: none;
+    padding: 0;
+    letter-spacing: 0.02em;
+}
+
+/* drop cap 克制：2.6em */
+.welcome-hero.v54 .hero-lead .drop {
+    font-size: 2.6em;
+    margin: 0.1em 0.16em -0.06em 0;
+}
+
+/* ---------- 尺度墙：数字字号降一档 ---------- */
+.welcome-hero.v54 .hero-scale {
+    grid-template-columns: repeat(5, 1fr);
+    margin: 0 0 3.6rem;
+    padding: 1.4rem 0.3rem;
+}
+
+.welcome-hero.v54 .scale-num {
+    font-size: clamp(1.3rem, 2.4vw, 1.85rem);
+    font-weight: 600;
+}
+
+.welcome-hero.v54 .scale-label {
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+}
+
+/* ---------- 对比条：一行低调排 ---------- */
+.welcome-hero.v54 .hero-contrast {
+    gap: 0.4rem 0.8rem;
+    padding: 0.7rem 1rem;
+    margin: 0 auto 4rem;
+    background: none;
+    border-top: 1px solid rgba(184, 115, 51, 0.1);
+    border-bottom: 1px solid rgba(184, 115, 51, 0.1);
+    border-radius: 0;
+    max-width: 720px;
+}
+
+.welcome-hero.v54 .contrast-not {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    opacity: 0.85;
+    padding: 0.1rem 0.4rem;
+}
+
+.welcome-hero.v54 .contrast-is {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    letter-spacing: 0.04em;
+    border-left-color: rgba(184, 115, 51, 0.55);
+}
+
+/* ---------- 四部曲 saga：字号下调 ---------- */
+.welcome-hero.v54 .hero-saga-head,
+.welcome-hero.v54 .hero-entries-head {
+    font-size: 0.72rem;
+    letter-spacing: 0.48em;
+    margin: 0 0 1.8rem;
+    opacity: 0.75;
+}
+
+.welcome-hero.v54 .hero-saga {
+    gap: 0.85rem;
+    margin: 0 0 4rem;
+}
+
+.welcome-hero.v54 .saga-step {
+    padding: 1.4rem 0.9rem 1.2rem;
+    border-radius: 10px;
+}
+
+.welcome-hero.v54 .saga-idx {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+}
+
+.welcome-hero.v54 .saga-name {
+    font-size: 1.05rem;
+    letter-spacing: 0.2em;
+    margin-bottom: 0.4rem;
+}
+
+.welcome-hero.v54 .saga-span {
+    font-size: 0.68rem;
+    margin-bottom: 0.75rem;
+}
+
+.welcome-hero.v54 .saga-thesis {
+    font-size: 0.86rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    min-height: 2.6em;
+}
+
+.welcome-hero.v54 .saga-hint {
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+    padding-top: 0.55rem;
+}
+
+/* ---------- 入口卡 ---------- */
+.welcome-hero.v54 .hero-entries {
+    gap: 0.85rem;
+    margin: 0 0 3.6rem;
+}
+
+.welcome-hero.v54 .entry-card {
+    padding: 1.6rem 0.9rem 1.3rem;
+    border-radius: 10px;
+}
+
+.welcome-hero.v54 .entry-glyph {
+    font-size: 1.25rem;
+    margin-bottom: 0.55rem;
+    opacity: 0.75;
+}
+
+.welcome-hero.v54 .entry-head {
+    font-size: 0.98rem;
+    letter-spacing: 0.2em;
+    margin-bottom: 0.4rem;
+}
+
+.welcome-hero.v54 .entry-desc {
+    font-size: 0.72rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+    letter-spacing: 0.03em;
+}
+
+/* ---------- 作者区 ---------- */
+.welcome-hero.v54 .hero-author {
+    padding-top: 2.4rem;
+    margin-top: 1.4rem;
+}
+
+.welcome-hero.v54 .hero-author-line {
+    font-size: 0.86rem;
+    letter-spacing: 0.26em;
+    color: var(--text-secondary);
+}
+
+.welcome-hero.v54 .hero-author-sub {
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    opacity: 0.85;
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 1024px) {
+    .welcome-hero.v54 { padding: 5rem 1.4rem 3.6rem; }
+    .welcome-hero.v54 .hero-scale { grid-template-columns: repeat(3, 1fr); gap: 1.1rem 0; }
+    .welcome-hero.v54 .hero-scale .scale-cell:nth-child(n+4) { margin-top: 0.4rem; }
+    .welcome-hero.v54 .scale-cell:nth-child(3n+1)::before { display: none; }
+    .welcome-hero.v54 .hero-saga { grid-template-columns: repeat(2, 1fr); }
+    .welcome-hero.v54 .hero-entries { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+    .welcome-hero.v54 { padding: 3.6rem 1.1rem 2.8rem; }
+    .welcome-hero.v54 .hero-title {
+        font-size: clamp(2.2rem, 9vw, 2.8rem) !important;
+        letter-spacing: 0.18em !important;
+    }
+    .welcome-hero.v54 .hero-slogan { font-size: 0.96rem; letter-spacing: 0.1em; }
+    .welcome-hero.v54 .hero-eyebrow { font-size: 0.62rem; letter-spacing: 0.36em; }
+    .welcome-hero.v54 .hero-intro-p { font-size: 0.94rem; line-height: 1.9; }
+    .welcome-hero.v54 .hero-lead .drop { font-size: 2.3em; }
+    .welcome-hero.v54 .hero-scale { grid-template-columns: repeat(2, 1fr); }
+    .welcome-hero.v54 .scale-cell::before { display: none !important; }
+    .welcome-hero.v54 .scale-cell:nth-child(2n+1) { border-right: 1px solid rgba(184, 115, 51, 0.12); }
+    .welcome-hero.v54 .contrast-not { font-size: 0.72rem; }
+    .welcome-hero.v54 .contrast-is { font-size: 0.76rem; width: 100%; text-align: center; border-left: none; border-top: 1px solid rgba(184, 115, 51, 0.2); padding-top: 0.55rem; margin-top: 0.3rem; margin-left: 0; }
+}
+
+@media (max-width: 420px) {
+    .welcome-hero.v54 .hero-saga { grid-template-columns: 1fr; }
+    .welcome-hero.v54 .hero-entries { grid-template-columns: 1fr; }
+}
+
+/* 深色模式 */
+[data-theme="dark"] .welcome-hero.v54 .hero-title {
+    text-shadow: 0 0 22px rgba(212, 147, 92, 0.18);
+}
+[data-theme="dark"] .welcome-hero.v54 .hero-intro-p em {
+    color: var(--copper-hover);
+}
+
+/* ============ v55 · Right Panel 折叠与优雅展开竖条 ============ */
+/* panel 内部的"收起"按钮（位于 tabs 左侧） */
+.right-panel .rp-collapse {
+    position: absolute;
+    left: 6px;
+    top: 8px;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.18s ease, color 0.18s ease, transform 0.25s ease;
+    z-index: 2;
+    opacity: 0.72;
+}
+.right-panel .rp-collapse:hover {
+    color: var(--copper, #b87333);
+    background: rgba(184, 115, 51, 0.08);
+    opacity: 1;
+    transform: translateX(-1px);
+}
+.right-panel .rp-tabs {
+    padding-left: 34px; /* 给收起按钮留位置 */
+}
+
+/* 收起后的优雅竖条展开按钮（贴屏幕右缘） */
+.right-panel-rail {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%) translateX(100%);
+    z-index: 790;
+    width: 28px;
+    min-height: 110px;
+    padding: 14px 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid var(--border);
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+    background: linear-gradient(
+        180deg,
+        rgba(184, 115, 51, 0.06) 0%,
+        var(--bg-paper, #fff) 18%,
+        var(--bg-paper, #fff) 82%,
+        rgba(184, 115, 51, 0.06) 100%
+    );
+    color: var(--text-secondary);
+    cursor: pointer;
+    box-shadow: -2px 0 14px rgba(0, 0, 0, 0.06);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.3s ease,
+                color 0.2s ease,
+                background 0.3s ease,
+                width 0.2s ease;
+    overflow: hidden;
+}
+/* 只在 body 标记收起态时滑入 */
+body.right-panel-collapsed .right-panel-rail {
+    display: flex;
+    transform: translateY(-50%) translateX(0);
+}
+.right-panel-rail .rail-glow {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+        120% 60% at 100% 50%,
+        rgba(184, 115, 51, 0.18) 0%,
+        rgba(184, 115, 51, 0.04) 40%,
+        transparent 75%
+    );
+    opacity: 0;
+    transition: opacity 0.35s ease;
+}
+.right-panel-rail:hover {
+    color: var(--copper, #b87333);
+    box-shadow: -4px 0 22px rgba(184, 115, 51, 0.18);
+    width: 32px;
+}
+.right-panel-rail:hover .rail-glow { opacity: 1; }
+.right-panel-rail:focus-visible {
+    outline: 2px solid var(--copper, #b87333);
+    outline-offset: -3px;
+}
+.right-panel-rail .rail-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(184, 115, 51, 0.1);
+    color: var(--copper, #b87333);
+    transition: transform 0.3s ease, background 0.25s ease;
+}
+.right-panel-rail:hover .rail-icon {
+    transform: translateX(-2px);
+    background: rgba(184, 115, 51, 0.2);
+}
+.right-panel-rail .rail-label {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    font-size: 0.68rem;
+    letter-spacing: 0.3em;
+    color: var(--text-muted);
+    line-height: 1.15;
+    white-space: nowrap;
+    user-select: none;
+    transition: color 0.2s ease;
+}
+.right-panel-rail:hover .rail-label { color: var(--copper, #b87333); }
+
+/* 移动端不显示 rail（用顶部按钮即可） */
+@media (max-width: 1024px) {
+    body.right-panel-collapsed .right-panel-rail { display: none; }
+    .right-panel .rp-collapse { display: none; }
+    .right-panel .rp-tabs { padding-left: 0; }
+}
+
+/* 深色模式适配 */
+[data-theme="dark"] .right-panel-rail {
+    background: linear-gradient(
+        180deg,
+        rgba(212, 147, 92, 0.08) 0%,
+        var(--bg-paper) 18%,
+        var(--bg-paper) 82%,
+        rgba(212, 147, 92, 0.08) 100%
+    );
+    box-shadow: -2px 0 14px rgba(0, 0, 0, 0.4);
+}
+[data-theme="dark"] .right-panel-rail:hover {
+    box-shadow: -4px 0 22px rgba(212, 147, 92, 0.22);
+}
+
+/* ============================================================
+   v58 · 视觉大幅升级
+   设计语言：
+   - 每一"部"有自己的色温与纹理，读者一眼识别"现在看的是哪部"
+   - hero 入口卡 hover 从"普通 box-shadow"升级为"铜色光栅扫描 + 灵机共振"
+   - 代码块 / 引用 / 表格 加入硬科幻仪表感
+   - obsidian-black 基底 + 铜鎏金 + 水墨分层
+   canon 锚点：灵机 0.003 Hz 波形 · 四部四色 · 非理性
+   铁律：v58 只做加法，不改既有 v53-v57 规则
+   ============================================================ */
+
+:root {
+    /* 四部主色（用于 data-book 区分） */
+    --book1-accent: #6a8ea8;        /* 壹 · 灵机江湖 = 青金（春 · 千里江山） */
+    --book1-tint: rgba(106, 142, 168, 0.08);
+    --book2-accent: #c55a3a;        /* 贰 · 山河破晓 = 铁火红（战火 · 熔炉） */
+    --book2-tint: rgba(197, 90, 58, 0.08);
+    --book3-accent: #a37ad6;        /* 叁 · 众神觉醒 = 星金紫（神格 · 九霄） */
+    --book3-tint: rgba(163, 122, 214, 0.08);
+    --book4-accent: #3a6aa0;        /* 肆 · 星汉余歌 = 深宇蓝（星际 · 挽歌） */
+    --book4-tint: rgba(58, 106, 160, 0.08);
+    /* 通用铜色（首页 / 设定页默认）保持现有 --copper */
+}
+
+[data-theme="dark"] {
+    --book1-accent: #8fb4cf;
+    --book1-tint: rgba(143, 180, 207, 0.1);
+    --book2-accent: #e07d55;
+    --book2-tint: rgba(224, 125, 85, 0.1);
+    --book3-accent: #c09be8;
+    --book3-tint: rgba(192, 155, 232, 0.1);
+    --book4-accent: #6a95cc;
+    --book4-tint: rgba(106, 149, 204, 0.1);
+}
+
+/* ----------- 每部视觉区分：章页顶部色带 + 左边缘铜纹 ----------- */
+.book-page[data-book="1"] { --page-accent: var(--book1-accent); --page-tint: var(--book1-tint); }
+.book-page[data-book="2"] { --page-accent: var(--book2-accent); --page-tint: var(--book2-tint); }
+.book-page[data-book="3"] { --page-accent: var(--book3-accent); --page-tint: var(--book3-tint); }
+.book-page[data-book="4"] { --page-accent: var(--book4-accent); --page-tint: var(--book4-tint); }
+
+/* 正文页顶部 1 像素色带 + 副 4 像素 tint 渗透（硬科幻仪表感） */
+.chapter-content[data-book] {
+    position: relative;
+}
+.chapter-content[data-book]::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--page-accent, var(--copper)) 15%,
+        var(--page-accent, var(--copper)) 85%,
+        transparent 100%);
+    opacity: 0.7;
+    pointer-events: none;
+}
+.chapter-content[data-book]::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: linear-gradient(180deg,
+        var(--page-tint, rgba(184,115,51,0.04)) 0%,
+        transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* 正文面包屑显示部标签（数字 Ⅰ Ⅱ Ⅲ Ⅳ） */
+.chapter-content[data-book] .crumb-book::before {
+    display: inline-block;
+    margin-right: 0.5em;
+    font-family: var(--font-serif);
+    font-weight: 700;
+    letter-spacing: 0;
+    color: var(--page-accent, var(--copper));
+    opacity: 0.85;
+    transform: translateY(-1px);
+    font-size: 1.05em;
+}
+.chapter-content[data-book="1"] .crumb-book::before { content: 'Ⅰ'; }
+.chapter-content[data-book="2"] .crumb-book::before { content: 'Ⅱ'; }
+.chapter-content[data-book="3"] .crumb-book::before { content: 'Ⅲ'; }
+.chapter-content[data-book="4"] .crumb-book::before { content: 'Ⅳ'; }
+
+/* 正文内 h1/h2 左边缘使用当前部色 */
+.chapter-content[data-book] #content h1,
+.chapter-content[data-book] #content h2 {
+    position: relative;
+}
+.chapter-content[data-book] #content h2::before {
+    content: '';
+    position: absolute;
+    left: -1rem;
+    top: 0.35em;
+    bottom: 0.35em;
+    width: 3px;
+    background: linear-gradient(180deg, var(--page-accent, var(--copper)), transparent);
+    border-radius: 2px;
+}
+
+/* ----------- 代码块 v58 升级：仪表盘质感 + 铜色扫描线 ----------- */
+#content pre {
+    position: relative;
+    background: linear-gradient(180deg, #fafafa 0%, #f4f2ed 100%);
+    border-left: 3px solid var(--page-accent, var(--copper));
+    border-top: 1px solid rgba(184, 115, 51, 0.15);
+    border-right: 1px solid rgba(184, 115, 51, 0.08);
+    border-bottom: 1px solid rgba(184, 115, 51, 0.08);
+    box-shadow:
+        0 1px 2px rgba(0,0,0,0.04),
+        0 4px 12px -6px rgba(184, 115, 51, 0.15),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+    border-radius: 6px;
+}
+#content pre::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 3px;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent,
+        var(--page-accent, var(--copper)) 20%,
+        var(--page-accent, var(--copper)) 80%,
+        transparent);
+    opacity: 0.45;
+    pointer-events: none;
+}
+/* 右上角仪表点（三色 LED） */
+#content pre::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--page-accent, var(--copper));
+    box-shadow:
+        -10px 0 0 rgba(184, 115, 51, 0.35),
+        -20px 0 0 rgba(184, 115, 51, 0.2);
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+[data-theme="dark"] #content pre {
+    background: linear-gradient(180deg, #1c1c1c 0%, #161616 100%);
+    box-shadow:
+        0 1px 2px rgba(0,0,0,0.6),
+        0 4px 14px -6px rgba(212, 147, 92, 0.25),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+/* ----------- 引用块 v58：左边双线 + 顶部符号 ----------- */
+#content blockquote {
+    position: relative;
+    border-left: 3px solid var(--page-accent, var(--copper));
+    background: linear-gradient(90deg,
+        var(--page-tint, var(--copper-light)) 0%,
+        transparent 60%);
+    padding: 1rem 1.3rem 1rem 1.6rem;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+#content blockquote::before {
+    content: '";';
+    position: absolute;
+    left: 0.45rem;
+    top: -0.2rem;
+    font-family: 'Georgia', var(--font-serif);
+    font-size: 2.2rem;
+    line-height: 1;
+    color: var(--page-accent, var(--copper));
+    opacity: 0.22;
+    letter-spacing: -0.15em;
+    pointer-events: none;
+}
+/* 引用块内段落不再 italic（灰底太重） */
+#content blockquote p {
+    font-style: normal;
+}
+
+/* ----------- 表格 v58：仪表盘栅格 ----------- */
+#content table {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    border-top: 2px solid var(--page-accent, var(--copper));
+    border-bottom: 2px solid var(--page-accent, var(--copper));
+}
+#content table th {
+    background: transparent;
+    border-bottom: 1px solid var(--page-accent, var(--copper));
+    border-right: none;
+    color: var(--page-accent, var(--copper));
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: none;
+    padding: 0.7rem 1rem 0.55rem;
+}
+#content table td {
+    border-right: none;
+    border-bottom: 1px solid rgba(184, 115, 51, 0.1);
+}
+#content table tr:nth-child(even) td {
+    background: var(--page-tint, rgba(184, 115, 51, 0.02));
+}
+#content table tr:hover td {
+    background: var(--page-tint, rgba(184, 115, 51, 0.06));
+    transition: background 0.2s ease;
+}
+
+/* ----------- 面包屑：部分色 ----------- */
+.chapter-content[data-book] .crumb-book {
+    color: var(--page-accent, var(--copper));
+    font-weight: 600;
+    letter-spacing: 0.08em;
+}
+
+/* ----------- Hero 入口卡 v58：灵机共振 hover 动画 ----------- */
+/* 覆盖 v53 的 entry-card hover，保留 transform/border，升级内部动效 */
+.welcome-hero.v58 .entry-card {
+    background:
+        linear-gradient(180deg, var(--bg-paper) 0%, var(--bg-paper) 100%);
+    transition:
+        transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 0.4s ease,
+        box-shadow 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* 扫描线 overlay：从下往上的铜色薄雾 */
+.welcome-hero.v58 .entry-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        transparent 0%,
+        transparent 70%,
+        rgba(184, 115, 51, 0.14) 85%,
+        transparent 100%
+    );
+    transform: translateY(100%);
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+    z-index: 1;
+}
+.welcome-hero.v58 .entry-card:hover::after {
+    transform: translateY(-100%);
+}
+.welcome-hero.v58 .entry-card:hover {
+    transform: translateY(-6px);
+    box-shadow:
+        0 20px 50px -18px rgba(184, 115, 51, 0.45),
+        0 0 0 1px rgba(184, 115, 51, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+/* 入口标题悬停轻微字距展开：canon "展开一张图" */
+.welcome-hero.v58 .entry-card:hover .entry-head {
+    letter-spacing: 0.24em;
+    transition: letter-spacing 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.welcome-hero.v58 .entry-card .entry-head {
+    transition: letter-spacing 0.4s ease;
+}
+/* 入口 glyph 悬停发光 */
+.welcome-hero.v58 .entry-card:hover .entry-glyph {
+    color: var(--copper-hover);
+    text-shadow: 0 0 16px rgba(184, 115, 51, 0.6);
+    transform: scale(1.08);
+}
+.welcome-hero.v58 .entry-card .entry-glyph {
+    transition: color 0.3s ease, text-shadow 0.4s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    display: inline-block;
+}
+
+/* saga 四部卡：每卡使用其部色作为 hover accent */
+.welcome-hero.v58 .hero-saga .saga-step[data-step="1"] { --step-accent: var(--book1-accent); }
+.welcome-hero.v58 .hero-saga .saga-step[data-step="2"] { --step-accent: var(--book2-accent); }
+.welcome-hero.v58 .hero-saga .saga-step[data-step="3"] { --step-accent: var(--book3-accent); }
+.welcome-hero.v58 .hero-saga .saga-step[data-step="4"] { --step-accent: var(--book4-accent); }
+.welcome-hero.v58 .hero-saga .saga-step {
+    position: relative;
+}
+.welcome-hero.v58 .hero-saga .saga-step::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background: var(--step-accent, var(--copper));
+    transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1), left 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    border-radius: 1px;
+    pointer-events: none;
+    opacity: 0.8;
+}
+.welcome-hero.v58 .hero-saga .saga-step:hover::after {
+    width: 70%;
+    left: 15%;
+}
+.welcome-hero.v58 .hero-saga .saga-step:hover {
+    border-color: var(--step-accent, var(--copper));
+    box-shadow: 0 16px 40px -16px color-mix(in srgb, var(--step-accent, var(--copper)) 50%, transparent);
+}
+.welcome-hero.v58 .hero-saga .saga-step:hover .saga-idx,
+.welcome-hero.v58 .hero-saga .saga-step:hover .saga-name {
+    color: var(--step-accent, var(--copper));
+    transition: color 0.3s ease;
+}
+
+/* ----------- Hero 品牌：灵机波形微装饰（呼应 favicon） ----------- */
+.welcome-hero.v58 .hero-brand {
+    position: relative;
+}
+.welcome-hero.v58 .hero-brand::after {
+    content: '';
+    display: block;
+    width: 72px;
+    height: 14px;
+    margin: 0.5rem auto 0;
+    opacity: 0.45;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 14'><path d='M 2 10 L 24 10 Q 28 10 30 6 Q 34 2 36 2 Q 38 2 42 6 Q 44 10 48 10 L 70 10' fill='none' stroke='%23b87333' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/><circle cx='36' cy='2' r='1.2' fill='%23e0aa70'/></svg>");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+/* ----------- 设定 / 人物 / 世界观页：纸面温度（书卷气） ----------- */
+/* 无 data-book 的设定页保留现有铜色系，增加一层细水墨纹理 overlay */
+.book-page:not([data-book]) {
+    position: relative;
+}
+.book-page:not([data-book])::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+        radial-gradient(circle at 15% 12%, rgba(184, 115, 51, 0.025) 0%, transparent 25%),
+        radial-gradient(circle at 88% 85%, rgba(184, 115, 51, 0.02) 0%, transparent 30%);
+    border-radius: inherit;
+    z-index: 0;
+}
+.book-page > * { position: relative; z-index: 1; }
+
+[data-theme="dark"] .book-page:not([data-book])::before {
+    background-image:
+        radial-gradient(circle at 15% 12%, rgba(212, 147, 92, 0.04) 0%, transparent 25%),
+        radial-gradient(circle at 88% 85%, rgba(212, 147, 92, 0.03) 0%, transparent 30%);
+}
+
+/* ----------- 章节导航按钮：铜色细边 + 悬停微扫光 ----------- */
+.chapter-nav-btn {
+    position: relative;
+    overflow: hidden;
+}
+.chapter-nav-btn:not([disabled])::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(184, 115, 51, 0.18),
+        transparent);
+    transition: left 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+}
+.chapter-nav-btn:not([disabled]):hover::before {
+    left: 130%;
+}
+
+/* ----------- Unified header：底部细铜线（仪表感） ----------- */
+.unified-header {
+    position: relative;
+}
+.unified-header::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(184, 115, 51, 0.35) 20%,
+        rgba(184, 115, 51, 0.35) 80%,
+        transparent 100%);
+    pointer-events: none;
+}
+
+/* ----------- 无障碍：减少动画 ----------- */
+@media (prefers-reduced-motion: reduce) {
+    .welcome-hero.v58 .entry-card::after,
+    .chapter-nav-btn::before,
+    .welcome-hero.v58 .hero-saga .saga-step::after {
+        transition: none !important;
+    }
+}
+
+

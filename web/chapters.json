@@ -3,42 +3,6 @@
     "title": "《神临山海》百科全书",
     "sections": [
       {
-        "title": "📖 正文",
-        "type": "chapters",
-        "books": [
-          {
-            "book": "第一部·灵机江湖 卷一·千里江山（旧版）",
-            "chapters": [
-              { "title": "第一章·入画", "file": "_staging/manuscript/book1_vol1/ch01_入画.md", "slug": "1-001" },
-              { "title": "第二章·听竹", "file": "_staging/manuscript/book1_vol1/ch02_听竹.md", "slug": "1-002" },
-              { "title": "第三章·幻破", "file": "_staging/manuscript/book1_vol1/ch03_幻破.md", "slug": "1-003" },
-              { "title": "第四章·倒悬", "file": "_staging/manuscript/book1_vol1/ch04_倒悬.md", "slug": "1-004" },
-              { "title": "第五章·隼啸", "file": "_staging/manuscript/book1_vol1/ch05_隼啸.md", "slug": "1-005" },
-              { "title": "第六章·横舟", "file": "_staging/manuscript/book1_vol1/ch06_横舟.md", "slug": "1-006" },
-              { "title": "第七章·墨鹿", "file": "_staging/manuscript/book1_vol1/ch07_墨鹿.md", "slug": "1-007" },
-              { "title": "第八章·蟒影", "file": "_staging/manuscript/book1_vol1/ch08_蟒影.md", "slug": "1-008" },
-              { "title": "第九章·崖闻", "file": "_staging/manuscript/book1_vol1/ch09_崖闻.md", "slug": "1-009" },
-              { "title": "第十章·佛问", "file": "_staging/manuscript/book1_vol1/ch10_佛问.md", "slug": "1-010" },
-              { "title": "第十一章·千目", "file": "_staging/manuscript/book1_vol1/ch11_千目.md", "slug": "1-011" },
-              { "title": "第十二章·虫心", "file": "_staging/manuscript/book1_vol1/ch12_虫心.md", "slug": "1-012" },
-              { "title": "第十三章·墨渡", "file": "_staging/manuscript/book1_vol1/ch13_墨渡.md", "slug": "1-013" },
-              { "title": "第十四章·补天", "file": "_staging/manuscript/book1_vol1/ch14_补天.md", "slug": "1-014" },
-              { "title": "第十五章·镜碎", "file": "_staging/manuscript/book1_vol1/ch15_镜碎.md", "slug": "1-015" },
-              { "title": "第十六章·抱影", "file": "_staging/manuscript/book1_vol1/ch16_抱影.md", "slug": "1-016" },
-              { "title": "第十七章·试刀", "file": "_staging/manuscript/book1_vol1/ch17_试刀.md", "slug": "1-017" },
-              { "title": "第十八章·再闻", "file": "_staging/manuscript/book1_vol1/ch18_再闻.md", "slug": "1-018" },
-              { "title": "第十九章·霜灯", "file": "_staging/manuscript/book1_vol1/ch19_霜灯.md", "slug": "1-019" },
-              { "title": "第二十章·金散", "file": "_staging/manuscript/book1_vol1/ch20_金散.md", "slug": "1-020" },
-              { "title": "第二十一章·燃灯", "file": "_staging/manuscript/book1_vol1/ch21_燃灯.md", "slug": "1-021" },
-              { "title": "第二十二章·天裂", "file": "_staging/manuscript/book1_vol1/ch22_天裂.md", "slug": "1-022" },
-              { "title": "第二十三章·不怕", "file": "_staging/manuscript/book1_vol1/ch23_不怕.md", "slug": "1-023" },
-              { "title": "第二十四章·山海谣", "file": "_staging/manuscript/book1_vol1/ch24_山海谣.md", "slug": "1-024" },
-              { "title": "第二十五章·千里", "file": "_staging/manuscript/book1_vol1/ch25_千里.md", "slug": "1-025" }
-            ]
-          }
-        ]
-      },
-      {
         "title": "⚖️ 圣旨（Bible）",
         "type": "world-building",
         "items": [
@@ -97,7 +61,18 @@
           { "title": "山海虚拟世界", "file": "world/book1_worlds.md", "icon": "🎮", "slug": "shanhai-worlds" },
           { "title": "山海与现实镜像", "file": "world/shanhai_mirror_realworld.md", "icon": "🪞", "slug": "shanhai-mirror" },
           { "title": "九大派系", "file": "world/book2_factions.md", "icon": "🏛️", "slug": "factions" },
-          { "title": "MoReal 梦如集团", "file": "world/moreal_group.md", "icon": "🎮", "slug": "moreal" }
+          { "title": "MoReal 梦如集团", "file": "world/moreal_group.md", "icon": "🎮", "slug": "moreal" },
+          { "title": "灵武镇", "file": "world/lingwu_town.md", "icon": "🏯", "slug": "lingwu-town" },
+          { "title": "灵武台", "file": "world/lingwutai.md", "icon": "⛩️", "slug": "lingwutai" },
+          { "title": "灵武榜", "file": "world/lingwubang.md", "icon": "📜", "slug": "lingwubang" },
+          { "title": "江湖秩序（师门/侠义/隐逸/名号/恩仇）", "file": "world/jianghu_order.md", "icon": "⚔️", "slug": "jianghu-order" },
+          { "title": "Cycle 与异域神话遗迹", "file": "cosmology/cycles_and_ruins.md", "icon": "🗿", "slug": "cycles-ruins" },
+          { "title": "山海 1.0 · 千里江山", "file": "reference/shanhai_v1_千里江山.md", "icon": "🏔️", "slug": "sh-v1" },
+          { "title": "山海 2.0 · 清明上河", "file": "reference/shanhai_v2_清明上河.md", "icon": "🏙️", "slug": "sh-v2" },
+          { "title": "卷二·清明上河 地理时空母本", "file": "world/book1_vol2_qingmingshanghe.md", "icon": "🗺️", "slug": "qingming-geo" },
+          { "title": "山海 3.0 · 爱音塔", "file": "reference/shanhai_v3_爱音塔.md", "icon": "🗼", "slug": "sh-v3" },
+          { "title": "山海 4.0 · 灵机海", "file": "reference/shanhai_v4_灵机海.md", "icon": "🌊", "slug": "sh-v4" },
+          { "title": "山海四版本对照", "file": "reference/shanhai_four_versions_master.md", "icon": "🔄", "slug": "shanhai-versions" }
         ]
       },
       {
@@ -107,11 +82,19 @@
           { "title": "人物总索引", "file": "characters/index.md", "icon": "📋", "slug": "characters-index" },
           { "title": "核心六人", "file": "characters/book_0_core.md", "icon": "⚓", "slug": "core-six" },
           { "title": "第一部群像", "file": "characters/book_1_cast.md", "icon": "📕", "slug": "book1-cast" },
+          { "title": "无茗（Omego 师父）", "file": "characters/wuming.md", "icon": "🍵", "slug": "wuming" },
           { "title": "第二部群像", "file": "characters/book_2_cast.md", "icon": "📗", "slug": "book2-cast" },
           { "title": "第三部群像", "file": "characters/book_3_cast.md", "icon": "📘", "slug": "book3-cast" },
           { "title": "第四部群像", "file": "characters/book_4_cast.md", "icon": "📙", "slug": "book4-cast" },
           { "title": "关系网络", "file": "characters/relations_map.md", "icon": "🕸️", "slug": "relations" },
           { "title": "命运线索", "file": "characters/destiny_threads.md", "icon": "🧵", "slug": "destiny" }
+        ]
+      },
+      {
+        "title": "🎬 名场面",
+        "type": "characters",
+        "items": [
+          { "title": "名场面总索引", "file": "moments/index.md", "icon": "📋", "slug": "moments-index" }
         ]
       },
       {
@@ -143,44 +126,73 @@
           { "title": "四劫叙事风格", "file": "principle/four_tribulations_style.md", "icon": "🎨", "slug": "four-tribulations" },
           { "title": "第四部叙事技术", "file": "principle/book4_narrative_techniques.md", "icon": "📖", "slug": "book4-narrative" },
           { "title": "第一部设计", "file": "principle/book1_design.md", "icon": "📐", "slug": "book1-design" },
-          { "title": "流程标准", "file": "principle/process_standards.md", "icon": "📋", "slug": "process-standards" }
+          { "title": "流程标准", "file": "principle/process_standards.md", "icon": "📋", "slug": "process-standards" },
+          { "title": "写作总纲", "file": "reference/writing_总纲.md", "icon": "📋", "slug": "writing-master" },
+          { "title": "伏笔矩阵", "file": "reference/writing_伏笔矩阵.md", "icon": "🧭", "slug": "writing-foreshadow" },
+          { "title": "情感框架", "file": "reference/writing_情感框架.md", "icon": "💓", "slug": "writing-emotion" },
+          { "title": "视觉体系", "file": "reference/writing_视觉体系.md", "icon": "🎨", "slug": "writing-visual" }
         ]
       },
       {
-        "title": "📚 参考材料",
+        "title": "🎮 产品系列",
+        "type": "parapark",
+        "items": [
+          { "title": "ParaPark · 灵机江湖 设计总纲", "file": "parapark/PARAPARK设计总纲.md", "icon": "📘", "slug": "parapark-overview" },
+          { "title": "Omego · 灵武镇单文档交付 v2.0", "file": "world/omego.md", "icon": "🏯", "slug": "omego" },
+          { "title": "Omego! 灵武镇 · 游戏化产品设计方案", "file": "world/omego_product.md", "icon": "🎯", "slug": "omego-product" }
+        ]
+      },
+      {
+        "title": "📚 参考与借鉴",
         "type": "reference",
         "items": [
           { "title": "大师作品借鉴", "file": "reference/masterwork_bible.md", "icon": "📖", "slug": "masterwork" },
           { "title": "伟大作品基因图谱", "file": "reference/greatness_reference.md", "icon": "🏆", "slug": "greatness" },
           { "title": "角色设计研究", "file": "reference/character_design_research.md", "icon": "🎭", "slug": "char-design" },
           { "title": "文笔风格基准", "file": "reference/style_samples.md", "icon": "✍️", "slug": "style-samples" },
-          { "title": "山海四版本对照", "file": "reference/shanhai_four_versions_master.md", "icon": "🔄", "slug": "shanhai-versions" },
-          { "title": "灵感火花集", "file": "reference/sparkles.md", "icon": "✨", "slug": "sparkles" }
-        ]
-      },
-      {
-        "title": "🔬 科幻内核",
-        "type": "reference",
-        "items": [
+          { "title": "灵感火花集", "file": "reference/sparkles.md", "icon": "✨", "slug": "sparkles" },
           { "title": "科幻内核总索引", "file": "reference/scifi_index.md", "icon": "🔬", "slug": "sf-index" },
           { "title": "三体系列内核", "file": "reference/scifi_three_body.md", "icon": "🌍", "slug": "three-body" },
           { "title": "基地系列内核", "file": "reference/scifi_foundation.md", "icon": "🏛️", "slug": "foundation" },
           { "title": "沙丘系列内核", "file": "reference/scifi_dune.md", "icon": "🏜️", "slug": "dune" },
           { "title": "海伯利安系列", "file": "reference/scifi_hyperion.md", "icon": "⏳", "slug": "hyperion" },
           { "title": "神经漫游者系列", "file": "reference/scifi_neuromancer.md", "icon": "💻", "slug": "neuromancer" },
-          { "title": "其他经典作品", "file": "reference/scifi_other_classics.md", "icon": "📚", "slug": "sf-other" }
+          { "title": "其他经典作品", "file": "reference/scifi_other_classics.md", "icon": "📚", "slug": "sf-other" },
+          { "title": "经典深度分析总览", "file": "reference/masterpiece_index.md", "icon": "🎯", "slug": "masterpiece-analysis" },
+          { "title": "终极裁定", "file": "reference/masterpiece_final_verdict.md", "icon": "⚖️", "slug": "final-verdict" },
+          { "title": "终极裁定 V2", "file": "reference/masterpiece_final_verdict_v2.md", "icon": "⚖️", "slug": "final-verdict-v2" },
+          { "title": "四评委裁定", "file": "reference/masterpiece_four_critics.md", "icon": "👨‍⚖️", "slug": "four-critics" },
+          { "title": "差距分析", "file": "reference/masterpiece_gap_analysis.md", "icon": "📊", "slug": "gap-analysis" },
+          { "title": "大师审计 V3", "file": "reference/masterpiece_audit_v3.md", "icon": "🔍", "slug": "master-audit" }
         ]
       },
       {
-        "title": "🎯 经典作品深度分析",
+        "title": "📝 卷一大纲 · 草稿",
         "type": "reference",
         "items": [
-          { "title": "深度分析总览", "file": "reference/masterpiece_index.md", "icon": "🎯", "slug": "masterpiece-analysis" },
-          { "title": "终极裁定", "file": "reference/masterpiece_final_verdict.md", "icon": "⚖️", "slug": "final-verdict" },
-          { "title": "终极裁定V2", "file": "reference/masterpiece_final_verdict_v2.md", "icon": "⚖️", "slug": "final-verdict-v2" },
-          { "title": "四评委裁定", "file": "reference/masterpiece_four_critics.md", "icon": "👨‍⚖️", "slug": "four-critics" },
-          { "title": "差距分析", "file": "reference/masterpiece_gap_analysis.md", "icon": "📊", "slug": "gap-analysis" },
-          { "title": "大师审计V3", "file": "reference/masterpiece_audit_v3.md", "icon": "🔍", "slug": "master-audit" }
+          { "title": "旧版 v1 · 25 章梗概", "file": "reference/outline_b1v1_25章梗概.md", "icon": "📖", "slug": "ob1v1-25" },
+          { "title": "旧版 v1 · 逐场景细纲", "file": "reference/outline_b1v1_逐场景细纲.md", "icon": "🎬", "slug": "ob1v1-scene" },
+          { "title": "新版 v2 · 框架", "file": "reference/outline_b1v2_框架.md", "icon": "🧩", "slug": "ob1v2-frame" },
+          { "title": "新版 v2 · 终稿状态", "file": "reference/outline_b1v2_终稿状态.md", "icon": "✅", "slug": "ob1v2-final" },
+          { "title": "新版 v2 · 创意框架（待定）", "file": "reference/outline_b1v2_创意框架待定.md", "icon": "💡", "slug": "ob1v2-creative" },
+          { "title": "新版 v2 · v0.20 框架", "file": "reference/outline_b1v2_v020框架.md", "icon": "📐", "slug": "ob1v2-v020" },
+          { "title": "新版 v2 · v0.20 终极框架", "file": "reference/outline_b1v2_v020终极框架.md", "icon": "🏁", "slug": "ob1v2-v020u" },
+          { "title": "逐章 · 第 01 章", "file": "reference/outline_b1v2_ch01.md", "icon": "①", "slug": "ob1v2-ch01" },
+          { "title": "逐章 · 第 01 章（替代稿）", "file": "reference/outline_b1v2_ch01_alt.md", "icon": "①", "slug": "ob1v2-ch01-alt" },
+          { "title": "逐章 · 第 02 章", "file": "reference/outline_b1v2_ch02.md", "icon": "②", "slug": "ob1v2-ch02" },
+          { "title": "逐章 · 第 03 章", "file": "reference/outline_b1v2_ch03.md", "icon": "③", "slug": "ob1v2-ch03" },
+          { "title": "逐章 · 第 04 章", "file": "reference/outline_b1v2_ch04.md", "icon": "④", "slug": "ob1v2-ch04" },
+          { "title": "逐章 · 第 05 章", "file": "reference/outline_b1v2_ch05.md", "icon": "⑤", "slug": "ob1v2-ch05" },
+          { "title": "逐章 · 第 06 章", "file": "reference/outline_b1v2_ch06.md", "icon": "⑥", "slug": "ob1v2-ch06" },
+          { "title": "逐章 · 第 07 章", "file": "reference/outline_b1v2_ch07.md", "icon": "⑦", "slug": "ob1v2-ch07" },
+          { "title": "逐章 · 第 08 章", "file": "reference/outline_b1v2_ch08.md", "icon": "⑧", "slug": "ob1v2-ch08" },
+          { "title": "逐章 · 第 09 章", "file": "reference/outline_b1v2_ch09.md", "icon": "⑨", "slug": "ob1v2-ch09" },
+          { "title": "逐章 · 第 10 章", "file": "reference/outline_b1v2_ch10.md", "icon": "⑩", "slug": "ob1v2-ch10" },
+          { "title": "逐章 · 第 09–15 章总览", "file": "reference/outline_b1v2_ch09to15_overview.md", "icon": "📊", "slug": "ob1v2-ch09to15-ov" },
+          { "title": "逐章 · 第 11–15 章概要", "file": "reference/outline_b1v2_ch11to15.md", "icon": "📑", "slug": "ob1v2-ch11to15" },
+          { "title": "逐章 · 第 11–15 章详稿", "file": "reference/outline_b1v2_ch11to15_detail.md", "icon": "📝", "slug": "ob1v2-ch11to15-detail" },
+          { "title": "逐章 · 第 16–25 章总览", "file": "reference/outline_b1v2_ch16to25_overview.md", "icon": "📊", "slug": "ob1v2-ch16to25-ov" },
+          { "title": "逐章 · 第 16–25 章详稿", "file": "reference/outline_b1v2_ch16to25_detail.md", "icon": "📝", "slug": "ob1v2-ch16to25-detail" }
         ]
       },
       {

@@ -6,17 +6,34 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#b87333">
-    <meta name="description" content="东方硬科幻武侠神话四部曲 - 人类的不理性是超能力">
+    <meta name="description" content="东方硬科幻武侠神话四部曲 - 人类的非理性，是超能力">
     <title>《神临山海》- 东方硬科幻武侠四部曲</title>
-    <link rel="stylesheet" href="web/styles.css?v=44">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/atom-one-light.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/highlight.min.js"></script>
+
+    <!-- v59 favicon · 全出血无白角 · "山"字篆印 -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=59">
+    <link rel="alternate icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=59">
+    <link rel="alternate icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=59">
+    <link rel="shortcut icon" href="/favicon.ico?v=59">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=59">
+    <link rel="manifest" href="/site.webmanifest?v=59">
+    <meta name="apple-mobile-web-app-title" content="神临山海">
+
+    <link rel="stylesheet" href="web/styles.css?v=59">
+
+    <!-- 字体：只用单源 + async（media=print onload 技巧）避免首屏阻塞 -->
+    <link rel="preconnect" href="https://fonts.loli.net" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap"
+          media="print" onload="this.media='all'; this.onload=null;">
+    <noscript><link rel="stylesheet" href="https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap"></noscript>
+
+    <!-- marked / highlight.js 首屏不需要（reader 初始 hero 不走 markdownToHTML），defer 不阻塞解析 -->
+    <script defer src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/atom-one-light.min.css"
+          media="print" onload="this.media='all'; this.onload=null;">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/atom-one-light.min.css"></noscript>
+    <script defer src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/highlight.min.js"></script>
 
 </head>
 <body>
@@ -32,14 +49,22 @@
                 <a href="#" class="nav-link" data-section="world-building">世界观</a>
                 <a href="#" class="nav-link" data-section="characters">人物</a>
                 <a href="#" class="nav-link" data-section="chapters">正文</a>
+                <a href="#" class="nav-link" data-section="parapark">产品系列</a>
                 <a href="#" class="nav-link" data-section="reference">参考</a>
                 <a href="#" class="nav-link" id="interactionBtn">互动</a>
             </nav>
             
             <div class="header-actions">
+                <button class="header-icon-btn sidebar-toggle-btn" id="sidebarToggle" aria-label="收起/展开目录" title="收起/展开目录">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
                 <div class="search-box" id="searchBox">
-                    <input type="text" id="searchInput" placeholder="搜索..." />
-                    <button id="searchButton">🔍</button>
+                    <input type="text" id="searchInput" placeholder="🔍 本页搜索 / Enter 全站" />
+                    <button id="searchButton" title="搜索">🔍</button>
                 </div>
                 <button class="header-icon-btn" id="rightPanelToggle" aria-label="目录/评论" title="目录 / 评论">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -105,26 +130,143 @@
             <article class="reader-content" id="readerContent">
                 <div class="book-page">
                     <div id="content">
-                        <div class="welcome-screen">
-                            <h2>欢迎阅读《神临山海》</h2>
-                            <p class="intro-text">这不仅是一部科幻神话，更是一个正在生成的精彩宇宙。</p>
-                            <div class="stats-grid">
-                                <div class="stat-item">
-                                    <div class="stat-val" id="totalChapters">-</div>
-                                    <div class="stat-label">文档总数</div>
+                        <div class="welcome-hero v53 v54 v55 v56 v57 v58">
+                            <!-- 1. 品牌区：大标题 + 小字副题 -->
+                            <div class="hero-brand">
+                                <div class="hero-eyebrow">东方硬科幻 · 武侠 · 神话</div>
+                                <h1 class="hero-title">神临山海</h1>
+                                <p class="hero-slogan">因果推理的尽头，不是逻辑——是非理性。</p>
+                                <div class="hero-brand-rule" aria-hidden="true"></div>
+                            </div>
+
+                            <!--
+                                v57 概要简介（2026-04-19 第二次重写）
+                                铁律：
+                                - 起笔 canon："因果推理的尽头，不是逻辑——是非理性"（hero-slogan 已保留）
+                                - 硬核具象：从山海1.0千里江山起笔，三战、众神、Cycle、五外星文明依次铺开
+                                - 四段结构：起点 → 灵机江湖 → 众神觉醒 → 星汉余歌
+                                - 用 canon 专名：山海1.0、灵机0.003Hz、山海币MOT、灵核、Cycle收割、九神格、五外星文明
+                                - 禁用：父亲/母亲/凌晨两点/讣告/"有一个..."/个人家庭煽情
+                            -->
+
+                            <!-- 2. 硬核概要简介（世界观铺陈 · 四段具象） -->
+                            <div class="hero-intro">
+                                <p class="hero-intro-p hero-lead">
+                                    <span class="drop">因</span>果推理的尽头，不是逻辑——是<em>非理性</em>。公元2030 年春，梦如智能发布人类首座 AI 原生虚拟世界——<em>山海 1.0·千里江山</em>。AI 1.5 的世界模型在数字山河里长出第一片能被走入的风景。上线第十七分钟，监测设备捕捉到人类历史上第一个有效<em>灵机</em>读数：0.003 Hz。全世界只有一个人知道这意味着什么——他盯着那个数字，什么也没写。
+                                </p>
+                                <p class="hero-intro-p">
+                                    灵机是意识中唯一不可计算、不可克隆、不可拷贝的真随机（Wootters–Zurek 守恒）。一旦被测量，它成为货币（<em>山海币 MOT</em>），成为武器，成为宗教，成为修行。2034 年 AI 2.0 冷觉醒，2038 年 AI 3.0 热觉醒——人类进入与四位 AI 共处的世界。九大派系依地脉节点各自崛起，为一滴灵机互相吞噬。2053 年灵机农场曝光 1700 人被囚禁提取；2055 天启遇刺；<em>2056 — 2059 第三次世界大战</em>，半数聚变电站被摧毁。人类第一颗<em>灵核</em>在战火末年的硝烟里诞生。
+                                </p>
+                                <p class="hero-intro-p">
+                                    2126 年之后，修行进入<em>众神觉醒</em>时代——神不是降临，是被记住的人；九神格寻找宿主，三大阵营博弈，外星文明第一次低头看向地球。而更远处，<em>Cycle 收割</em>来了——它不是敌人、不是惩罚，是宇宙的自动免疫系统，是白细胞认出了过量的光。亚特兰蒂斯、楼兰、玛雅、复活节岛——都是前代文明在同一个剧本里留下的碑。它们一座接一座沉入深海、埋进沙漠、消失在集体记忆里。
+                                </p>
+                                <p class="hero-intro-p">
+                                    四部十六卷，从 2030 到十五万年之后：灵机江湖 → 山河破晓 → 众神觉醒 → 星汉余歌。五外星文明依次登场，Architect 从未解释自己。一个问题贯穿十五万年：<strong>算得清的一切都会被算法找到；算不清的那一点，是活下来的全部理由。</strong>
+                                </p>
+                            </div>
+
+                            <!-- 3. 尺度墙 · 5格数据（去掉「15万年」格，避免玄幻联想） -->
+                            <div class="hero-scale" aria-label="作品尺度">
+                                <div class="scale-cell">
+                                    <div class="scale-num" data-count-target="500" data-count-suffix="万字">—</div>
+                                    <div class="scale-label">目标规模</div>
                                 </div>
-                                <div class="stat-item">
-                                    <div class="stat-val" id="totalWords">-</div>
-                                    <div class="stat-label">总字数</div>
+                                <div class="scale-cell">
+                                    <div class="scale-num" data-count-target="16" data-count-suffix="卷">—</div>
+                                    <div class="scale-label">四部 · 十六卷</div>
                                 </div>
-                                <div class="stat-item">
-                                    <div class="stat-val" id="settingWords">-</div>
-                                    <div class="stat-label">设定字数</div>
+                                <div class="scale-cell">
+                                    <div class="scale-num" id="scaleRules" data-count-suffix="条">—</div>
+                                    <div class="scale-label">不可违反铁律</div>
                                 </div>
-                                <div class="stat-item">
-                                    <div class="stat-val" id="chapterWords">-</div>
-                                    <div class="stat-label">正文字数</div>
+                                <div class="scale-cell">
+                                    <div class="scale-num" id="scaleMoments" data-count-suffix="场">—</div>
+                                    <div class="scale-label">名场面</div>
                                 </div>
+                                <div class="scale-cell">
+                                    <div class="scale-num" id="scaleWords">—</div>
+                                    <div class="scale-label">已建设定字数</div>
+                                </div>
+                            </div>
+
+                            <!-- 4. 对比条（降权：一行低调排） -->
+                            <div class="hero-contrast" aria-label="类型边界">
+                                <span class="contrast-not">不是仙侠</span>
+                                <span class="contrast-not">不是玄幻</span>
+                                <span class="contrast-not">不是赛博朋克</span>
+                                <span class="contrast-not">不是轻小说</span>
+                                <span class="contrast-is">是把物理、修行与神话揉成的一个自洽宇宙</span>
+                            </div>
+
+                            <!-- 5. 四部曲命题卡（字号下调 · 一卡一句诗） -->
+                            <div class="hero-saga-head">四部 · 一条时间线</div>
+                            <div class="hero-saga">
+                                <div class="saga-step" data-step="1">
+                                    <div class="saga-idx">壹</div>
+                                    <div class="saga-name">灵机江湖</div>
+                                    <div class="saga-span">2030 — 2040</div>
+                                    <div class="saga-thesis">看见，就是参与。</div>
+                                    <div class="saga-hint">山海崛起 · AI 四子觉醒</div>
+                                </div>
+                                <div class="saga-step" data-step="2">
+                                    <div class="saga-idx">贰</div>
+                                    <div class="saga-name">山河破晓</div>
+                                    <div class="saga-span">2026 — 2126</div>
+                                    <div class="saga-thesis">不讲道理的那一点火，是最后的防线。</div>
+                                    <div class="saga-hint">三战爆发 · 觉醒世代</div>
+                                </div>
+                                <div class="saga-step" data-step="3">
+                                    <div class="saga-idx">叁</div>
+                                    <div class="saga-name">众神觉醒</div>
+                                    <div class="saga-span">2126 — 5000</div>
+                                    <div class="saga-thesis">神，是被记住的人。</div>
+                                    <div class="saga-hint">九神格宿主 · 三阵营博弈</div>
+                                </div>
+                                <div class="saga-step" data-step="4">
+                                    <div class="saga-idx">肆</div>
+                                    <div class="saga-name">星汉余歌</div>
+                                    <div class="saga-span">5000 — 尽头</div>
+                                    <div class="saga-thesis">谢幕，也要有人听见。</div>
+                                    <div class="saga-hint">五外星文明 · 宇宙挽歌</div>
+                                </div>
+                            </div>
+
+                            <!-- 6. 入口（字号下调 · 描述诗化） -->
+                            <div class="hero-entries-head">从这里进入</div>
+                            <div class="hero-entries">
+                                <a class="entry-card" href="#" data-nav-section="world-building">
+                                    <div class="entry-glyph" aria-hidden="true">○</div>
+                                    <div class="entry-head">世界观</div>
+                                    <div class="entry-desc">四个世界 · 一种稀缺 · 无数次觉醒</div>
+                                </a>
+                                <a class="entry-card" href="#" data-nav-section="chapters">
+                                    <div class="entry-glyph" aria-hidden="true">卷</div>
+                                    <div class="entry-head">编年史</div>
+                                    <div class="entry-desc">从一个春日凌晨，一路走到宇宙尽头</div>
+                                </a>
+                                <a class="entry-card" href="#" data-nav-section="characters">
+                                    <div class="entry-glyph" aria-hidden="true">人</div>
+                                    <div class="entry-head">人物</div>
+                                    <div class="entry-desc">核心六人 · 他们各自是谁，最终去向何处</div>
+                                </a>
+                                <a class="entry-card" href="#" data-nav-section="world-building">
+                                    <div class="entry-glyph" aria-hidden="true">◇</div>
+                                    <div class="entry-head">设定</div>
+                                    <div class="entry-desc">物理、修行、AI——都得自洽</div>
+                                </a>
+                            </div>
+
+                            <!-- 7. 兼容旧 ID 的隐藏统计（给旧的 updateStats 用），页面可见新统计走 scaleWords -->
+                            <div class="hero-stats legacy-stats" aria-hidden="true">
+                                <div class="stat-item"><div class="stat-val" id="totalChapters">—</div><div class="stat-label">文档</div></div>
+                                <div class="stat-item"><div class="stat-val" id="totalWords">—</div><div class="stat-label">总字数</div></div>
+                                <div class="stat-item"><div class="stat-val" id="settingWords">—</div><div class="stat-label">设定</div></div>
+                                <div class="stat-item"><div class="stat-val" id="chapterWords">—</div><div class="stat-label">正文</div></div>
+                            </div>
+
+                            <div class="hero-author">
+                                <div class="hero-author-line">作者 · 虎王船长</div>
+                                <div class="hero-author-sub">设定先行 · 正文后发 · 第一二部设定 95% · 第三四部 80%+</div>
                             </div>
                         </div>
                     </div>
@@ -134,8 +276,12 @@
             <!-- 搜索结果面板 -->
             <div class="search-results-panel" id="searchResultsPanel">
                 <div class="search-panel-header">
-                    <h3>搜索结果</h3>
-                    <button class="close-search" id="closeSearch">✕</button>
+                    <div class="search-tabs" role="tablist">
+                        <button class="search-tab active" data-search-scope="page" role="tab">本页</button>
+                        <button class="search-tab" data-search-scope="site" role="tab">全站</button>
+                    </div>
+                    <div class="search-stream-status" id="searchStreamStatus"></div>
+                    <button class="close-search" id="closeSearch" title="关闭搜索">✕</button>
                 </div>
                 <div class="search-results-body" id="searchResultsList"></div>
             </div>
@@ -162,6 +308,6 @@
         <button id="mobileSearchClose">✕</button>
     </div>
 
-    <script src="web/reader.js?v=44"></script>
+    <script defer src="web/reader.js?v=59"></script>
 </body>
 </html>

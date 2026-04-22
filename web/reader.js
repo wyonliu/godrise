@@ -19,8 +19,71 @@ const state = {
     cachedChapterWords: 0,
     cachedSettingWords: 0,
     commentSidebarOpen: false,
-    apiAvailable: null
+    apiAvailable: null,
+    // 文档内存缓存：path -> markdown text；命中即 0 延迟渲染
+    _docCache: Object.create(null),
+    // 正在进行的 fetch Promise：去重并发请求
+    _fetchInflight: Object.create(null),
+    // 当前 loadItem 序号：后发起的请求会取消前面未完成的渲染
+    _loadSeq: 0
 };
+
+/**
+ * 带缓存 + 并发去重 + 30s 超时 + 单次重试 的文档获取
+ * @param {string} path 文档路径
+ * @returns {Promise<string>} markdown 原文
+ */
+async function fetchDoc(path) {
+    if (state._docCache[path]) return state._docCache[path];
+    if (state._fetchInflight[path]) return state._fetchInflight[path];
+
+    const doFetch = async (attempt) => {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(new Error('加载超时（30秒），请检查网络')), 30000);
+        try {
+            const res = await fetch(path, { signal: ctrl.signal, cache: 'default' });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const text = await res.text();
+            state._docCache[path] = text;
+            return text;
+        } finally {
+            clearTimeout(timer);
+        }
+    };
+
+    const promise = (async () => {
+        try {
+            return await doFetch(1);
+        } catch (e1) {
+            // 第一次失败（含超时/网络抖动），等 400ms 再试一次
+            await new Promise(r => setTimeout(r, 400));
+            return await doFetch(2);
+        }
+    })().finally(() => {
+        delete state._fetchInflight[path];
+    });
+
+    state._fetchInflight[path] = promise;
+    return promise;
+}
+
+/**
+ * 空闲时预取相邻章节，翻页秒开
+ */
+function prefetchNeighbors(currentIdx) {
+    const schedule = window.requestIdleCallback || ((fn) => setTimeout(fn, 800));
+    schedule(() => {
+        const neighbors = [currentIdx + 1, currentIdx - 1, currentIdx + 2];
+        for (const idx of neighbors) {
+            if (idx < 0 || idx >= state.allItems.length) continue;
+            const it = state.allItems[idx];
+            if (!it || !it.file) continue;
+            const p = resolvePath(it.file);
+            if (state._docCache[p] || state._fetchInflight[p]) continue;
+            fetchDoc(p).catch(() => {}); // 预取失败静默
+        }
+    }, { timeout: 2000 });
+}
 
 async function apiCall(endpoint, method, body) {
     try {
@@ -100,7 +163,17 @@ async function bootApp() {
  */
 function restorePageFromHash() {
     const raw = window.location.hash;
-    if (!raw || raw.length <= 1) return;
+    // 空 hash = 首页，触发 goHome 恢复 hero（修 v52：浏览器后退到空 hash 时原本卡住）
+    if (!raw || raw.length <= 1) {
+        if (typeof goHome === 'function' && window.__HERO_HTML) {
+            const contentArea = document.getElementById('content');
+            // 只有当前不是 hero 时才恢复，避免无意义刷新；fromHistory=true 不 push
+            if (contentArea && !contentArea.querySelector('.welcome-hero')) {
+                goHome(true);
+            }
+        }
+        return;
+    }
     const h = raw.substring(1);
     // 互动中心
     if (h === 'interaction') {
@@ -168,7 +241,9 @@ async function loadEncyclopedia() {
     const nav = document.getElementById('chapterNav');
     try {
         console.log('📥 开始加载目录...');
-        const response = await fetch('web/chapters.json?v=' + Date.now());
+        // v58 性能修复：去掉 Date.now() cache-bust，改用版本号参数让 HTTP 缓存生效
+        // （chapters.json 由构建脚本生成，改动时手工提 v 即可；刷新时走 304/强缓存）
+        const response = await fetch('web/chapters.json?v=61', { cache: 'default' });
         if (!response.ok) throw new Error('HTTP ' + response.status);
         
         const text = await response.text();
@@ -272,6 +347,8 @@ function renderNavigation(data) {
     data.sections?.forEach((section, sIdx) => {
         const secEl = document.createElement('div');
         secEl.className = 'encyclopedia-section';
+        secEl.dataset.sectionType = section.type || '';
+        secEl.dataset.sectionIdx = sIdx;
         
         const titleEl = document.createElement('div');
         titleEl.className = 'section-title';
@@ -351,124 +428,159 @@ function createNavItem(text, type, sIdx, idx1, idx2 = -1, icon = '') {
  */
 async function loadItem(sIdx, idx1, idx2, type, scrollAnchor) {
     const contentArea = document.getElementById('content');
-    
+    const mySeq = ++state._loadSeq;
+
     closeRightPanel();
     state.currentItem = { sIdx, idx1, idx2, type };
     state.pageReadStart = Date.now();
-    
-    const item = state.allItems.find(i => 
-        i.sIdx === sIdx && 
+
+    const item = state.allItems.find(i =>
+        i.sIdx === sIdx &&
         (type === 'chapter' ? (i.bIdx === idx1 && i.cIdx === idx2) : i.iIdx === idx1)
     );
-    const path = item ? getPathFromItem(item) : '';
-    window.location.hash = path + (scrollAnchor ? '#' + scrollAnchor : '');
-    
-    contentArea.style.transition = 'opacity 0.2s';
-    contentArea.style.opacity = '0';
-    
-    try {
-        const item = state.allItems.find(i => 
-            i.sIdx === sIdx && 
-            (type === 'chapter' ? (i.bIdx === idx1 && i.cIdx === idx2) : i.iIdx === idx1)
-        );
-        
-        if (!item) throw new Error('未找到内容');
-        
-        setTimeout(async () => {
-            contentArea.innerHTML = '<div style="text-align: center; padding: 4rem; color: var(--text-muted);">正在加载...</div>';
-            contentArea.style.opacity = '1';
-
-            const path = resolvePath(item.file);
-            const response = await fetch(path);
-            if (!response.ok) throw new Error('文件加载失败');
-            
-            const markdown = await response.text();
-            const html = markdownToHTML(markdown);
-            
-            // 存储当前文档路径，用于解析相对链接
-            state.currentDocPath = item.file;
-            
-            // 构建导航按钮
-            const currentIdx = state.allItems.findIndex(i => 
-                i.sIdx === sIdx && 
-                (type === 'chapter' ? (i.bIdx === idx1 && i.cIdx === idx2) : i.iIdx === idx1)
-            );
-            
-            const hasPrev = currentIdx > 0;
-            const hasNext = currentIdx < state.allItems.length - 1;
-            
-            contentArea.innerHTML = `
-                <div class="chapter-content">
-                    <div class="chapter-nav-top">
-                        <button class="chapter-nav-btn" id="topPrevBtn" ${!hasPrev ? 'disabled' : ''}>‹ 上一章</button>
-                        <span class="chapter-info-inline">${item.bookTitle || item.sectionTitle} · ${item.title}</span>
-                        <button class="chapter-nav-btn" id="topNextBtn" ${!hasNext ? 'disabled' : ''}>下一章 ›</button>
-                    </div>
-                    ${html}
-                    <div class="vote-section" id="voteContainer"></div>
-                    <div class="chapter-nav-bottom">
-                        <button class="chapter-nav-btn" id="bottomPrevBtn" ${!hasPrev ? 'disabled' : ''}>‹ 上一章</button>
-                        <span class="chapter-info-inline">${item.bookTitle || item.sectionTitle}</span>
-                        <button class="chapter-nav-btn" id="bottomNextBtn" ${!hasNext ? 'disabled' : ''}>下一章 ›</button>
-                    </div>
-                </div>
-            `;
-            
-            // 绑定按钮事件
-            if (hasPrev) {
-                document.getElementById('topPrevBtn').onclick = () => navigateChapter(-1);
-                document.getElementById('bottomPrevBtn').onclick = () => navigateChapter(-1);
-            }
-            if (hasNext) {
-                document.getElementById('topNextBtn').onclick = () => navigateChapter(1);
-                document.getElementById('bottomNextBtn').onclick = () => navigateChapter(1);
-            }
-            
-            updateActiveNavItem();
-            
-            // 设置内部链接拦截
-            setupInternalLinks();
-            
-            // 生成页内目录（TOC）
-            generatePageTOC();
-            
-            // 确保当前项的目录section是展开的
-            expandNavToCurrentItem();
-            
-            const readerContent = document.getElementById('readerContent');
-            
-            // 如果有搜索关键词，进行高亮和定位（不重置滚动位置）
-            if (state.searchHighlight) {
-                const searchData = state.searchHighlight;
-                const query = typeof searchData === 'object' ? searchData.query : searchData;
-                setTimeout(() => highlightAndScrollToSearch(query), 100);
-                state.searchHighlight = null;
-            } else if (scrollAnchor) {
-                setTimeout(() => scrollToHeading(scrollAnchor), 150);
-            } else {
-                readerContent.scrollTop = 0;
-            }
-            initProgressTracker();
-            initTOCScrollSpy();
-            state._lastPath = getPathFromItem(item);
-
-            // Render vote button for this page
-            const voteKey = getPageKey();
-            renderVoteButton(voteKey);
-
-            if (window.innerWidth <= 1024) {
-                document.getElementById('sidebar').classList.remove('open');
-            }
-            if (window.innerWidth > 1024) {
-                openRightPanel(false);
-                switchRightPanelTab('toc');
-            }
-        }, 200);
-        
-    } catch (error) {
-        contentArea.innerHTML = `<div style="text-align: center; padding: 4rem; color: var(--text-muted);">加载失败: ${error.message}</div>`;
-        contentArea.style.opacity = '1';
+    if (!item) {
+        contentArea.innerHTML = '<div style="text-align:center;padding:4rem;color:var(--text-muted);">未找到内容</div>';
+        return;
     }
+
+    const hashPath = getPathFromItem(item);
+    window.location.hash = hashPath + (scrollAnchor ? '#' + scrollAnchor : '');
+
+    const path = resolvePath(item.file);
+    const cached = state._docCache[path];
+
+    // 1. 立即发起 fetch（如果没缓存），与 UI 动画并行跑
+    const docPromise = cached ? Promise.resolve(cached) : fetchDoc(path);
+
+    // 2. 淡出动画 + loading 占位（命中缓存则跳过占位）
+    contentArea.style.transition = 'opacity 0.15s';
+    if (!cached) {
+        contentArea.style.opacity = '0';
+        // 仅在 150ms 内未命中时显示 loading，避免闪屏
+        setTimeout(() => {
+            if (state._loadSeq !== mySeq) return;
+            if (state._docCache[path]) return; // 已到手
+            contentArea.innerHTML = '<div class="page-loading" style="text-align:center;padding:4rem;color:var(--text-muted);">正在加载…</div>';
+            contentArea.style.opacity = '1';
+        }, 150);
+    }
+
+    let markdown;
+    try {
+        markdown = await docPromise;
+    } catch (err) {
+        if (state._loadSeq !== mySeq) return; // 已被更新请求取代
+        console.error('[loadItem fetch]', err);
+        const msg = (err && err.message) ? err.message : String(err);
+        contentArea.innerHTML = `
+            <div style="text-align:center;padding:4rem;color:var(--text-muted);">
+                <div style="margin-bottom:1rem;">加载失败</div>
+                <div style="font-size:0.85em;opacity:0.7;margin-bottom:1.5rem;">${msg}</div>
+                <button class="chapter-nav-btn" id="retryLoadBtn">重试</button>
+            </div>`;
+        contentArea.style.opacity = '1';
+        const retry = document.getElementById('retryLoadBtn');
+        if (retry) retry.onclick = () => {
+            delete state._docCache[path];
+            delete state._fetchInflight[path];
+            loadItem(sIdx, idx1, idx2, type, scrollAnchor);
+        };
+        return;
+    }
+
+    // 如果用户已切到别的页面，丢弃本次渲染
+    if (state._loadSeq !== mySeq) return;
+
+    const html = markdownToHTML(markdown);
+    state.currentDocPath = item.file;
+
+    const currentIdx = state.allItems.findIndex(i =>
+        i.sIdx === sIdx &&
+        (type === 'chapter' ? (i.bIdx === idx1 && i.cIdx === idx2) : i.iIdx === idx1)
+    );
+    const hasPrev = currentIdx > 0;
+    const hasNext = currentIdx < state.allItems.length - 1;
+
+    const isNovel = (type === 'chapter');
+    // v58: 从章节信息推断"部"编号，用于视觉分层（data-book="1|2|3|4"）
+    const bookNum = (() => {
+        if (!isNovel) return '';
+        // 优先从 slug（如 "1-001"）取首位数字
+        if (item.slug) {
+            const m = String(item.slug).match(/^(\d)/);
+            if (m) return m[1];
+        }
+        // 回退：从 bookTitle 的"第X部"汉字
+        if (item.bookTitle) {
+            const map = { '一': '1', '二': '2', '三': '3', '四': '4' };
+            const m = item.bookTitle.match(/第([一二三四])部/);
+            if (m && map[m[1]]) return map[m[1]];
+        }
+        return '';
+    })();
+    const crumb = item.bookTitle
+        ? `<span class="crumb-book">${item.bookTitle}</span><span class="crumb-sep">·</span><span class="crumb-item">${item.title}</span>`
+        : `<span class="crumb-section">${(item.sectionTitle || '').replace(/^[^\w\u4e00-\u9fa5]+/, '').trim()}</span><span class="crumb-sep">·</span><span class="crumb-item">${item.title}</span>`;
+    contentArea.innerHTML = `
+        <div class="chapter-content${isNovel ? ' is-novel' : ''}"${bookNum ? ` data-book="${bookNum}"` : ''}>
+            <div class="chapter-nav-top">
+                <button class="chapter-nav-btn" id="topPrevBtn" ${!hasPrev ? 'disabled' : ''}>‹ 上一章</button>
+                <span class="chapter-info-inline">${crumb}</span>
+                <button class="chapter-nav-btn" id="topNextBtn" ${!hasNext ? 'disabled' : ''}>下一章 ›</button>
+            </div>
+            ${html}
+            <div class="vote-section" id="voteContainer"></div>
+            <div class="chapter-nav-bottom">
+                <button class="chapter-nav-btn" id="bottomPrevBtn" ${!hasPrev ? 'disabled' : ''}>‹ 上一章</button>
+                <span class="chapter-info-inline">${item.bookTitle || item.sectionTitle}</span>
+                <button class="chapter-nav-btn" id="bottomNextBtn" ${!hasNext ? 'disabled' : ''}>下一章 ›</button>
+            </div>
+        </div>
+    `;
+    contentArea.style.opacity = '1';
+
+    if (hasPrev) {
+        document.getElementById('topPrevBtn').onclick = () => navigateChapter(-1);
+        document.getElementById('bottomPrevBtn').onclick = () => navigateChapter(-1);
+    }
+    if (hasNext) {
+        document.getElementById('topNextBtn').onclick = () => navigateChapter(1);
+        document.getElementById('bottomNextBtn').onclick = () => navigateChapter(1);
+    }
+
+    updateActiveNavItem();
+    setupInternalLinks();
+    generatePageTOC();
+    expandNavToCurrentItem();
+
+    const readerContent = document.getElementById('readerContent');
+    if (state.searchHighlight) {
+        const searchData = state.searchHighlight;
+        const query = typeof searchData === 'object' ? searchData.query : searchData;
+        setTimeout(() => highlightAndScrollToSearch(query), 100);
+        state.searchHighlight = null;
+    } else if (scrollAnchor) {
+        setTimeout(() => scrollToHeading(scrollAnchor), 150);
+    } else {
+        readerContent.scrollTop = 0;
+    }
+    initProgressTracker();
+    initTOCScrollSpy();
+    state._lastPath = getPathFromItem(item);
+
+    const voteKey = getPageKey();
+    renderVoteButton(voteKey);
+
+    if (window.innerWidth <= 1024) {
+        document.getElementById('sidebar').classList.remove('open');
+    }
+    if (window.innerWidth > 1024) {
+        openRightPanel(false);
+        switchRightPanelTab('toc');
+    }
+
+    // 空闲预取相邻章节（翻页秒开）
+    prefetchNeighbors(currentIdx);
 }
 
 function resolvePath(file) {
@@ -519,6 +631,18 @@ function markdownToHTML(md) {
         }
         return `<h${level} id="${baseId}">${text}</h${level}>`;
     };
+    // 图片懒加载：首图 eager+high，后续全 lazy+low，decoding=async
+    // 修复长文档多图一次性下载卡顿（如 PARAPARK 设计总纲 21 张 11MB）
+    let _imgIdx = 0;
+    renderer.image = function(href, title, text) {
+        const eager = _imgIdx === 0;
+        const loading = eager ? 'eager' : 'lazy';
+        const priority = eager ? 'high' : 'low';
+        _imgIdx++;
+        const safeAlt = (text || '').replace(/"/g, '&quot;');
+        const safeTitle = title ? ` title="${String(title).replace(/"/g, '&quot;')}"` : '';
+        return `<img src="${href}" alt="${safeAlt}"${safeTitle} loading="${loading}" decoding="async" fetchpriority="${priority}">`;
+    };
     marked.use({ renderer });
     
     // 使用marked渲染Markdown
@@ -526,11 +650,21 @@ function markdownToHTML(md) {
 }
 
 function initUI() {
+    // 首次启动时保存 hero 模板，用于"回首页"而无需刷新
+    const contentEl0 = document.getElementById('content');
+    if (contentEl0 && !window.__HERO_HTML) {
+        window.__HERO_HTML = contentEl0.innerHTML;
+    }
+
     const mainTitle = document.getElementById('mainTitle');
     if (mainTitle) {
-        mainTitle.onclick = () => {
-            location.reload();
-        };
+        mainTitle.style.cursor = 'pointer';
+        mainTitle.title = '返回首页';
+        mainTitle.onclick = goHome;
+    }
+    const headerBrand = document.querySelector('.header-brand');
+    if (headerBrand) {
+        headerBrand.onclick = goHome;
     }
     
     const drawer = document.getElementById('settingsDrawer');
@@ -558,7 +692,7 @@ function initUI() {
     const menuToggle = document.getElementById('menuToggle');
     const closeSidebar = document.getElementById('closeSidebar');
     const sidebar = document.getElementById('sidebar');
-    
+
     if (menuToggle) {
         menuToggle.onclick = () => {
             sidebar.classList.add('open');
@@ -570,9 +704,150 @@ function initUI() {
         };
     }
 
+    // 桌面端 sidebar 折叠切换（持久化到 localStorage）
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const applyCollapsedState = (collapsed) => {
+        document.body.classList.toggle('sidebar-collapsed', collapsed);
+        if (sidebarToggle) sidebarToggle.classList.toggle('collapsed', collapsed);
+        if (sidebarToggle) sidebarToggle.setAttribute('aria-expanded', String(!collapsed));
+    };
+    // 初始化：读 localStorage
+    try {
+        const savedCollapsed = localStorage.getItem('godrise_sidebar_collapsed') === '1';
+        if (savedCollapsed && window.innerWidth > 1024) applyCollapsedState(true);
+    } catch (e) { /* ignore */ }
+
+    if (sidebarToggle) {
+        sidebarToggle.onclick = () => {
+            // 移动端：复用为打开侧边栏
+            if (window.innerWidth <= 1024) {
+                sidebar?.classList.toggle('open');
+                return;
+            }
+            // 桌面端：切换折叠
+            const next = !document.body.classList.contains('sidebar-collapsed');
+            applyCollapsedState(next);
+            try { localStorage.setItem('godrise_sidebar_collapsed', next ? '1' : '0'); } catch (e) {}
+        };
+    }
+
     // ── Mobile bottom tabbar ──
     setupMobileTabbar(sidebar);
+
+    // ── v53 Hero 交互：尺度墙 count-up + 动态数据注入 ──
+    initHeroV53();
 }
+
+/* ============ v53 · Hero 首屏动效 ============
+ * - 尺度墙数字 count-up（IntersectionObserver 触发一次）
+ * - 从 stats.json 拉取铁律数/名场面数/设定字数动态填充
+ * - 不改既有 updateStats 流程，兼容 legacy-stats DOM
+ */
+function initHeroV53() {
+    const hero = document.querySelector('.welcome-hero.v53');
+    if (!hero) return;
+
+    const scaleNums = Array.from(hero.querySelectorAll('.scale-num[data-count-target]'));
+    const ruleEl = hero.querySelector('#scaleRules');
+    const momentEl = hero.querySelector('#scaleMoments');
+    const wordsEl = hero.querySelector('#scaleWords');
+
+    const formatWord = (n) => {
+        if (n >= 10000) return (n / 10000).toFixed(1) + '万';
+        return n.toLocaleString();
+    };
+
+    const playCount = (el, target, suffix, dur) => {
+        if (!el) return;
+        const fmt = (v) => {
+            const s = suffix ? `<span class="suffix">${suffix}</span>` : '';
+            return `${v}${s}`;
+        };
+        const start = performance.now();
+        const step = (now) => {
+            const t = Math.min(1, (now - start) / (dur || 900));
+            const eased = 1 - Math.pow(1 - t, 3);
+            const v = Math.round(target * eased);
+            el.innerHTML = fmt(v);
+            if (t < 1) requestAnimationFrame(step);
+            else el.innerHTML = fmt(target);
+        };
+        requestAnimationFrame(step);
+    };
+
+    const playCountCustom = (el, target, format, dur) => {
+        if (!el) return;
+        const start = performance.now();
+        const step = (now) => {
+            const t = Math.min(1, (now - start) / (dur || 1100));
+            const eased = 1 - Math.pow(1 - t, 3);
+            const v = target * eased;
+            el.innerHTML = format(v);
+            if (t < 1) requestAnimationFrame(step);
+            else el.innerHTML = format(target);
+        };
+        requestAnimationFrame(step);
+    };
+
+    // 拉取 stats.json，用真实数据填充
+    let statsPromise = fetch('web/stats.json?v=53', { cache: 'force-cache' })
+        .then(r => r.ok ? r.json() : null)
+        .catch(() => null);
+
+    const runOnce = () => {
+        // 固定尺度先播
+        scaleNums.forEach((el, i) => {
+            const target = parseInt(el.dataset.countTarget, 10);
+            const suffix = el.dataset.countSuffix || '';
+            playCount(el, target, suffix, 1000 + i * 80);
+        });
+
+        // 动态数据等 stats
+        statsPromise.then(stats => {
+            if (!stats) return;
+            // 铁律数 = itemCount（stats.json 中的 199）
+            const ruleCount = stats.itemCount || 199;
+            if (ruleEl) playCount(ruleEl, ruleCount, ruleEl.dataset.countSuffix || '条', 1300);
+
+            // 名场面数：统计 files 中 moments/b*_*.md
+            let momentCount = 0;
+            let settingWordCount = 0;
+            const files = stats.files || {};
+            for (const [path, wc] of Object.entries(files)) {
+                if (/^moments\/b\d+_.+\.md$/.test(path)) momentCount++;
+                if (!path.startsWith('_staging/manuscript/')) settingWordCount += wc;
+            }
+            if (momentEl) playCount(momentEl, momentCount, momentEl.dataset.countSuffix || '场', 1400);
+            if (wordsEl) {
+                const target = (stats.totals && stats.totals.settingWords) || settingWordCount;
+                playCountCustom(wordsEl, target, (v) => {
+                    const n = Math.round(v);
+                    return `${formatWord(n)}`;
+                }, 1500);
+            }
+        });
+    };
+
+    // IntersectionObserver：进入视口才播
+    if ('IntersectionObserver' in window) {
+        let played = false;
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting && !played) {
+                    played = true;
+                    runOnce();
+                    io.disconnect();
+                }
+            });
+        }, { threshold: 0.15 });
+        const scaleWall = hero.querySelector('.hero-scale');
+        if (scaleWall) io.observe(scaleWall);
+        else runOnce();
+    } else {
+        runOnce();
+    }
+}
+
 
 function setupMobileTabbar(sidebar) {
     const tabbar = document.getElementById('mobileTabbar');
@@ -612,11 +887,11 @@ function setupMobileTabbar(sidebar) {
         }
     });
 
-    // Mobile search → reuse performSearch
+    // Mobile search → reuse performSearch（移动端默认全站，placeholder 也写"搜索全文"）
     function doMobileSearch() {
         const q = mobileSearchInput?.value.trim();
         if (q && typeof performSearch === 'function') {
-            performSearch(q);
+            performSearch(q, 'site');
             mobileSearchBar?.classList.remove('open');
             document.getElementById('tabSearch')?.classList.remove('active');
         }
@@ -681,15 +956,57 @@ function initTheme() {
     }
 }
 
+function goHome(fromHistory) {
+    const contentArea = document.getElementById('content');
+    if (!contentArea || !window.__HERO_HTML) {
+        // 兜底：没拿到模板就走老办法
+        history.replaceState(null, '', location.pathname + location.search);
+        location.reload();
+        return;
+    }
+    // 非 history 恢复（即用户主动点首页）时 push 新历史条目，让浏览器后退回到阅读位置
+    if (!fromHistory) {
+        const hasHash = location.hash && location.hash.length > 1;
+        if (hasHash) {
+            // 先 push 无 hash 的 URL（触发 hashchange，但它会检测已是 hero 不重复渲染）
+            history.pushState({ home: true }, '', location.pathname + location.search);
+        }
+    }
+    contentArea.innerHTML = window.__HERO_HTML;
+    contentArea.style.opacity = '1';
+    // 关闭搜索面板、回声抽屉等
+    document.getElementById('searchResultsPanel')?.classList.remove('show');
+    document.getElementById('sidebar')?.classList.remove('open');
+    // 重新绑定 hero 内的 entry 卡片 + 重新动画统计
+    document.querySelectorAll('.entry-card[data-nav-section]').forEach(card => {
+        card.onclick = (e) => {
+            e.preventDefault();
+            const section = card.dataset.navSection;
+            const link = document.querySelector(`.nav-link[data-section="${section}"]`);
+            if (link) link.click();
+            else scrollToSectionAndLoad(section);
+        };
+    });
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    if (typeof updateStats === 'function') {
+        updateStats().catch(() => {});
+    }
+    // v53: 重新绑定尺度墙 count-up
+    if (typeof initHeroV53 === 'function') {
+        try { initHeroV53(); } catch (e) {}
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 function setupNavigation() {
     document.querySelectorAll('.nav-link').forEach(link => {
         link.onclick = (e) => {
             e.preventDefault();
             const section = link.dataset.section;
-            
+
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             link.classList.add('active');
-            
+
             if (link.id === 'interactionBtn') {
                 showInteractionPage();
             } else {
@@ -697,49 +1014,68 @@ function setupNavigation() {
             }
         };
     });
+
+    // 首页 hero 快速入口卡片
+    document.querySelectorAll('.entry-card[data-nav-section]').forEach(card => {
+        card.onclick = (e) => {
+            e.preventDefault();
+            const section = card.dataset.navSection;
+            const link = document.querySelector(`.nav-link[data-section="${section}"]`);
+            if (link) link.click();
+            else scrollToSectionAndLoad(section);
+        };
+    });
 }
 
 function scrollToSectionAndLoad(section) {
     const nav = document.getElementById('chapterNav');
     const sections = nav.querySelectorAll('.encyclopedia-section');
-    
+
+    // 按 section.type 精确匹配：world-building 有多个子区（圣旨/宇宙/力量/AI/山海…），
+    // 命中第一个，并展开同类型所有兄弟区，避免"点了没反应"
+    const typeMatch = [];
     sections.forEach((sec) => {
+        if (sec.dataset.sectionType === section) typeMatch.push(sec);
+    });
+
+    if (typeMatch.length === 0) {
+        // 兜底：按 section-title 文本模糊匹配
+        sections.forEach((sec) => {
+            const title = sec.querySelector('.section-title');
+            if (!title) return;
+            const text = title.textContent.toLowerCase();
+            if (text.includes(section)) typeMatch.push(sec);
+        });
+    }
+
+    if (typeMatch.length === 0) return;
+
+    // 展开全部同类型 section，滚到第一个
+    typeMatch.forEach((sec, idx) => {
         const title = sec.querySelector('.section-title');
         const content = sec.querySelector('.section-content');
-        
-        if (title) {
-            const text = title.textContent.toLowerCase();
-            const matches = 
-                text.includes(section) || 
-                (section === 'world-building' && text.includes('世界观')) ||
-                (section === 'characters' && text.includes('人物')) ||
-                (section === 'chapters' && text.includes('正文')) ||
-                (section === 'reference' && text.includes('参考'));
-            
-            if (matches) {
-                if (window.innerWidth <= 1024) {
-                    document.getElementById('sidebar').classList.add('open');
-                }
-                
-                if (content) {
-                    title.classList.add('active');
-                    content.classList.add('open');
-                    content.style.maxHeight = content.scrollHeight + 'px';
-                }
-                
-                setTimeout(() => {
-                    title.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 100);
-                
-                setTimeout(() => {
-                    const firstItem = content?.querySelector('.chapter-item');
-                    if (firstItem) {
-                        firstItem.click();
-                    }
-                }, 300);
-            }
-        }
+        if (!title || !content) return;
+        title.classList.add('active');
+        content.classList.add('open');
+        content.style.maxHeight = content.scrollHeight + 'px';
     });
+
+    if (window.innerWidth <= 1024) {
+        document.getElementById('sidebar').classList.add('open');
+    }
+
+    const first = typeMatch[0];
+    const firstTitle = first.querySelector('.section-title');
+    const firstContent = first.querySelector('.section-content');
+
+    setTimeout(() => {
+        firstTitle?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+
+    setTimeout(() => {
+        const firstItem = firstContent?.querySelector('.chapter-item');
+        if (firstItem) firstItem.click();
+    }, 300);
 }
 
 async function showInteractionPage() {
@@ -1038,37 +1374,76 @@ function setupSearch() {
     const searchBtn = document.getElementById('searchButton');
     const searchInput = document.getElementById('searchInput');
     const closeSearch = document.getElementById('closeSearch');
-    
+
+    // v56: 智能 scope 选择——首页/未打开文档默认全站；否则按钮=本页，Enter=全站
+    const pickInitialScope = (source) => {
+        if (!state.currentDocPath) return 'site';
+        if (source === 'enter') return 'site';
+        return 'page';
+    };
+
     if (searchBtn) {
         searchBtn.onclick = () => {
             const query = searchInput?.value.trim();
             if (query) {
-                performSearch(query);
+                performSearch(query, pickInitialScope('button'));
+            } else {
+                // 空查询：打开面板并提示
+                performSearch('', pickInitialScope('button'));
+                searchInput?.focus();
             }
         };
     }
-    
+
     if (searchInput) {
-        searchInput.onkeypress = (e) => {
-            if (e.key === 'Enter') {
+        // 使用 keydown 覆盖更多输入法情况；保留 Enter 触发全站
+        searchInput.onkeydown = (e) => {
+            if (e.key === 'Enter' && !e.isComposing) {
+                e.preventDefault();
                 const query = searchInput.value.trim();
                 if (query) {
-                    performSearch(query);
+                    performSearch(query, pickInitialScope('enter'));
                 }
+            } else if (e.key === 'Escape') {
+                document.getElementById('searchResultsPanel')?.classList.remove('show');
+                searchInput.blur();
             }
         };
     }
-    
+
     if (closeSearch) {
         closeSearch.onclick = () => {
             document.getElementById('searchResultsPanel')?.classList.remove('show');
+            clearSearchHighlight();
         };
     }
-    
-    // 点击目录或其他区域时关闭搜索面板
+
+    // v56 修复：tab 点击切换 scope（之前完全没有绑定，点了没反应）
+    document.querySelectorAll('.search-tab').forEach(tab => {
+        tab.onclick = () => {
+            const scope = tab.dataset.searchScope;
+            if (!scope) return;
+            const q = (searchInput?.value || _searchState.query || '').trim();
+            if (!q) {
+                // 无查询词时只更新视觉 + 记住用户选择
+                _searchState.scope = scope;
+                document.querySelectorAll('.search-tab').forEach(t => {
+                    t.classList.toggle('active', t.dataset.searchScope === scope);
+                });
+                return;
+            }
+            performSearch(q, scope);
+        };
+    });
+
+    // v56 修复：只有点击搜索面板外的 sidebar/内容区才关闭；面板自身点击不再冒泡关闭
+    const panel = document.getElementById('searchResultsPanel');
+    panel?.addEventListener('click', (e) => e.stopPropagation());
+
     document.getElementById('sidebar')?.addEventListener('click', () => {
         document.getElementById('searchResultsPanel')?.classList.remove('show');
     });
+    // 主内容区点击关闭面板（面板已 stopPropagation，不影响面板内操作）
     document.getElementById('readerContent')?.addEventListener('click', () => {
         document.getElementById('searchResultsPanel')?.classList.remove('show');
     });
@@ -1077,150 +1452,232 @@ function setupSearch() {
 // Search content cache — persists across searches in the same session
 const _searchCache = {};
 
-async function performSearch(query) {
+// v52 流式搜索状态 —— seq 用于取消过期请求，scope 记忆用户选择
+const _searchState = { seq: 0, scope: 'page', query: '' };
+
+function _escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+function _escapeHTML(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+}
+
+function _findMatches(text, lowerQuery, rawQuery, max) {
+    const matches = [];
+    const lowerText = text.toLowerCase();
+    let idx = 0, pos;
+    const limit = max || 80;
+    while ((pos = lowerText.indexOf(lowerQuery, idx)) !== -1 && matches.length < limit) {
+        const start = Math.max(0, pos - 50);
+        const end = Math.min(text.length, pos + rawQuery.length + 50);
+        const snippet = text.substring(start, end);
+        const lineNum = text.substring(0, pos).split('\n').length;
+        matches.push({ snippet, position: pos, lineNum });
+        idx = pos + rawQuery.length;
+    }
+    return matches;
+}
+
+function _renderMatchGroup(list, item, matches, query, gIdx) {
+    const displayTitle = item.type === 'chapter'
+        ? `${item.bookTitle || ''} · ${item.title}`
+        : `${item.sectionTitle || ''} · ${item.title}`;
+    const re = new RegExp(_escapeRegex(query), 'gi');
+    const matchesHtml = matches.map((m) => {
+        // v56 修复：先 escape HTML 避免片段里的 < & 等破坏渲染，再高亮
+        const safeSnippet = _escapeHTML(m.snippet);
+        // 用同样的 escape 后的 query 做替换，避免 query 含特殊字符时错位
+        const safeQuery = _escapeHTML(query);
+        const reSafe = new RegExp(_escapeRegex(safeQuery), 'gi');
+        const snippet = safeSnippet.replace(reSafe, (match) => `<mark>${match}</mark>`);
+        return `<div class="search-match-item"
+             data-sidx="${item.sIdx}"
+             data-type="${item.type}"
+             data-idx1="${item.type === 'chapter' ? item.bIdx : item.iIdx}"
+             data-idx2="${item.type === 'chapter' ? item.cIdx : -1}"
+             data-position="${m.position}"
+             data-query="${encodeURIComponent(query)}">
+            <span class="match-line">L${m.lineNum}</span>
+            <span class="match-snippet">…${snippet}…</span>
+        </div>`;
+    }).join('');
+
+    const groupEl = document.createElement('div');
+    groupEl.className = 'search-result-group';
+    groupEl.innerHTML = `
+        <div class="result-group-header" data-gidx="${gIdx}">
+            <span class="group-toggle">▼</span>
+            <span class="group-title">${displayTitle}</span>
+            <span class="group-count">${matches.length}</span>
+        </div>
+        <div class="result-group-matches">${matchesHtml}</div>
+    `;
+    list.appendChild(groupEl);
+
+    const header = groupEl.querySelector('.result-group-header');
+    const matchesEl = groupEl.querySelector('.result-group-matches');
+    const toggle = groupEl.querySelector('.group-toggle');
+    header.onclick = () => {
+        const collapsed = matchesEl.style.display === 'none';
+        matchesEl.style.display = collapsed ? 'block' : 'none';
+        toggle.textContent = collapsed ? '▼' : '▶';
+    };
+    groupEl.querySelectorAll('.search-match-item').forEach(el => {
+        el.onclick = (e) => {
+            e.stopPropagation();
+            const sIdx = parseInt(el.dataset.sidx);
+            const type = el.dataset.type;
+            const idx1 = parseInt(el.dataset.idx1);
+            const idx2 = parseInt(el.dataset.idx2);
+            const position = parseInt(el.dataset.position);
+            const searchQuery = decodeURIComponent(el.dataset.query);
+            state.searchHighlight = { query: searchQuery, position };
+            trackPageReadTime();
+            loadItem(sIdx, idx1, idx2, type);
+            document.getElementById('searchResultsPanel')?.classList.remove('show');
+        };
+    });
+}
+
+async function performSearch(query, scope) {
     const panel = document.getElementById('searchResultsPanel');
     const list = document.getElementById('searchResultsList');
-
+    const status = document.getElementById('searchStreamStatus');
     if (!panel || !list) return;
 
-    const total = state.allItems.length;
-    list.innerHTML = `<div style="text-align: center; padding: 3rem; color: var(--text-muted);">搜索中… <span id="searchProgress">0</span>/${total} 文档</div>`;
+    scope = scope || _searchState.scope || 'page';
+    _searchState.scope = scope;
+    _searchState.query = query;
+    const mySeq = ++_searchState.seq;
+
+    // 同步 tab 视觉
+    document.querySelectorAll('.search-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.searchScope === scope);
+    });
+
     panel.classList.add('show');
+    list.innerHTML = '';
+    if (status) { status.textContent = ''; status.classList.remove('done'); }
 
-    // Fetch all documents in parallel (with cache), then search
-    const progressEl = () => document.getElementById('searchProgress');
-    let fetched = 0;
-
-    // Parallel fetch with concurrency limit of 8
-    const BATCH = 8;
-    for (let i = 0; i < total; i += BATCH) {
-        const batch = state.allItems.slice(i, i + BATCH);
-        await Promise.all(batch.map(async (item) => {
-            const path = resolvePath(item.file);
-            if (!_searchCache[path]) {
-                try {
-                    const res = await fetch(path);
-                    if (res.ok) _searchCache[path] = await res.text();
-                } catch (e) { /* skip */ }
-            }
-            fetched++;
-            const el = progressEl();
-            if (el) el.textContent = fetched;
-        }));
+    if (!query || !query.trim()) {
+        // v56：空查询时仍同步 tab 视觉，并给出明确提示
+        list.innerHTML = `<div class="no-results">输入关键词后按 Enter（${scope === 'site' ? '全站' : '本页'}）</div>`;
+        return;
     }
-
-    // Now search locally — very fast
-    const groupedResults = [];
     const lowerQuery = query.toLowerCase();
 
-    for (const item of state.allItems) {
-        const path = resolvePath(item.file);
-        const text = _searchCache[path];
-        if (!text) continue;
-
-        const lowerText = text.toLowerCase();
-        const matches = [];
-        let searchIndex = 0;
-        let matchIndex;
-
-        while ((matchIndex = lowerText.indexOf(lowerQuery, searchIndex)) !== -1) {
-            const start = Math.max(0, matchIndex - 50);
-            const end = Math.min(text.length, matchIndex + query.length + 50);
-            const snippet = text.substring(start, end);
-            const lineNum = text.substring(0, matchIndex).split('\n').length;
-            matches.push({ snippet, position: matchIndex, lineNum });
-            searchIndex = matchIndex + query.length;
+    // ── 本页搜索（默认，极快）──
+    if (scope === 'page') {
+        const curPath = state.currentDocPath ? resolvePath(state.currentDocPath) : null;
+        const curItem = curPath ? state.allItems.find(i => resolvePath(i.file) === curPath) : null;
+        if (!curItem) {
+            // v56 修复：首页/未打开文档时，本页搜索无意义——自动切到全站
+            if (status) status.textContent = '首页无"本页"可搜，自动使用全站搜索';
+            return performSearch(query, 'site');
         }
-
-        if (matches.length > 0) {
-            groupedResults.push({ item, matches, matchCount: matches.length });
+        let text = state._docCache[curPath] || _searchCache[curPath];
+        if (!text) {
+            if (status) status.textContent = '加载本页…';
+            try { text = await fetchDoc(curPath); _searchCache[curPath] = text; }
+            catch (e) {
+                list.innerHTML = '<div class="no-results">加载本页失败</div>'; return;
+            }
         }
+        if (mySeq !== _searchState.seq) return;
+        const matches = _findMatches(text, lowerQuery, query, 200);
+        if (matches.length === 0) {
+            list.innerHTML = '<div class="no-results">本页无匹配 · <a class="switch-scope" data-switch="site">切到全站搜索</a></div>';
+            _wireScopeSwitch(query);
+            if (status) status.textContent = '0 / 本页';
+            return;
+        }
+        _renderMatchGroup(list, curItem, matches, query, 0);
+        const hint = document.createElement('div');
+        hint.className = 'search-scope-hint';
+        hint.innerHTML = `<a class="switch-scope" data-switch="site">→ 全站继续搜索 "${query.replace(/[<>&"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' })[c])}"</a>`;
+        list.appendChild(hint);
+        _wireScopeSwitch(query);
+        if (status) { status.textContent = `本页 ${matches.length} 处`; status.classList.add('done'); }
+        return;
     }
-    
-    // 计算总匹配数
-    const totalMatches = groupedResults.reduce((sum, g) => sum + g.matchCount, 0);
-    
-    if (groupedResults.length === 0) {
-        list.innerHTML = '<div class="no-results">未找到相关内容</div>';
-    } else {
-        let html = `<div class="search-summary">在 ${groupedResults.length} 个文档中找到 ${totalMatches} 个匹配</div>`;
-        
-        html += groupedResults.map((g, gIdx) => {
-            const displayTitle = g.item.type === 'chapter' 
-                ? `${g.item.bookTitle} · ${g.item.title}`
-                : `${g.item.sectionTitle} · ${g.item.title}`;
-            
-            const matchesHtml = g.matches.map((m, mIdx) => {
-                const snippet = m.snippet.replace(
-                    new RegExp(query, 'gi'),
-                    match => `<mark>${match}</mark>`
-                );
-                return `
-                    <div class="search-match-item" 
-                         data-sidx="${g.item.sIdx}" 
-                         data-type="${g.item.type}" 
-                         data-idx1="${g.item.type === 'chapter' ? g.item.bIdx : g.item.iIdx}" 
-                         data-idx2="${g.item.type === 'chapter' ? g.item.cIdx : -1}"
-                         data-position="${m.position}"
-                         data-query="${encodeURIComponent(query)}">
-                        <span class="match-line">L${m.lineNum}</span>
-                        <span class="match-snippet">...${snippet}...</span>
-                    </div>
-                `;
-            }).join('');
-            
-            return `
-                <div class="search-result-group">
-                    <div class="result-group-header" data-gidx="${gIdx}">
-                        <span class="group-toggle">▼</span>
-                        <span class="group-title">${displayTitle}</span>
-                        <span class="group-count">${g.matchCount} 个匹配</span>
-                    </div>
-                    <div class="result-group-matches" id="group-matches-${gIdx}">
-                        ${matchesHtml}
-                    </div>
-                </div>
-            `;
-        }).join('');
-        
-        list.innerHTML = html;
-        
-        // 折叠/展开事件
-        list.querySelectorAll('.result-group-header').forEach(header => {
-            header.onclick = () => {
-                const gIdx = header.dataset.gidx;
-                const matchesEl = document.getElementById(`group-matches-${gIdx}`);
-                const toggle = header.querySelector('.group-toggle');
-                if (matchesEl.style.display === 'none') {
-                    matchesEl.style.display = 'block';
-                    toggle.textContent = '▼';
-                } else {
-                    matchesEl.style.display = 'none';
-                    toggle.textContent = '▶';
-                }
-            };
-        });
-        
-        // 点击匹配项跳转并定位
-        list.querySelectorAll('.search-match-item').forEach(el => {
-            el.onclick = (e) => {
-                e.stopPropagation();
-                const sIdx = parseInt(el.dataset.sidx);
-                const type = el.dataset.type;
-                const idx1 = parseInt(el.dataset.idx1);
-                const idx2 = parseInt(el.dataset.idx2);
-                const position = parseInt(el.dataset.position);
-                const searchQuery = decodeURIComponent(el.dataset.query);
-                
-                // 保存搜索关键词和位置，用于文档加载后定位高亮
-                state.searchHighlight = { query: searchQuery, position };
-                
-                trackPageReadTime();
-                loadItem(sIdx, idx1, idx2, type);
-                panel.classList.remove('show');
-            };
-        });
+
+    // ── 全站流式搜索 ──
+    // 优先扫已缓存的文档，让用户"秒出第一批"
+    const total = state.allItems.length;
+    const cachedFirst = [];
+    const rest = [];
+    for (const it of state.allItems) {
+        if (!it.file) continue;
+        const p = resolvePath(it.file);
+        (state._docCache[p] || _searchCache[p]) ? cachedFirst.push(it) : rest.push(it);
     }
+    const ordered = [...cachedFirst, ...rest];
+
+    let scanned = 0, foundDocs = 0, hits = 0;
+    const updateStatus = () => {
+        if (!status) return;
+        status.textContent = `扫描 ${scanned}/${total} · 命中 ${foundDocs} 文档 · ${hits} 处`;
+    };
+    updateStatus();
+
+    const BATCH = 6;
+    for (let i = 0; i < ordered.length; i += BATCH) {
+        if (mySeq !== _searchState.seq) return; // 被新查询取代
+        const batch = ordered.slice(i, i + BATCH);
+        await Promise.all(batch.map(async (item) => {
+            if (mySeq !== _searchState.seq) return;
+            const p = resolvePath(item.file);
+            let text = state._docCache[p] || _searchCache[p];
+            if (!text) {
+                try { text = await fetchDoc(p); _searchCache[p] = text; }
+                catch (e) { scanned++; return; }
+            }
+            if (mySeq !== _searchState.seq) return;
+            const matches = _findMatches(text, lowerQuery, query, 50);
+            scanned++;
+            if (matches.length > 0) {
+                foundDocs++;
+                hits += matches.length;
+                _renderMatchGroup(list, item, matches, query, foundDocs - 1);
+            }
+            updateStatus();
+        }));
+    }
+    if (mySeq !== _searchState.seq) return;
+    if (foundDocs === 0) {
+        list.innerHTML = '<div class="no-results">全站无匹配</div>';
+    }
+    if (status) { status.textContent = `共 ${foundDocs} 文档 / ${hits} 处`; status.classList.add('done'); }
+}
+
+function _wireScopeSwitch(query) {
+    document.querySelectorAll('.switch-scope').forEach(a => {
+        a.onclick = (e) => {
+            e.preventDefault();
+            const next = a.dataset.switch || 'site';
+            performSearch(query, next);
+        };
+    });
+}
+
+/**
+ * 带动画的数字递增：从 0 平滑滚到 target
+ */
+function animateCount(el, target, formatter, durationMs) {
+    if (!el) return;
+    const start = performance.now();
+    const dur = durationMs || 900;
+    const from = 0;
+    const step = (now) => {
+        const t = Math.min(1, (now - start) / dur);
+        // easeOutCubic
+        const eased = 1 - Math.pow(1 - t, 3);
+        const v = Math.round(from + (target - from) * eased);
+        el.textContent = formatter ? formatter(v) : v;
+        if (t < 1) requestAnimationFrame(step);
+        else el.textContent = formatter ? formatter(target) : target;
+    };
+    requestAnimationFrame(step);
 }
 
 async function updateStats() {
@@ -1231,36 +1688,84 @@ async function updateStats() {
 
     const formatCount = (n) => n >= 10000 ? (n / 10000).toFixed(1) + '万' : n.toLocaleString();
 
-    if (totalEl) totalEl.textContent = state.allItems.length;
+    // Step 1: 先秒显总数（allItems 长度是已知的）
+    if (totalEl) animateCount(totalEl, state.allItems.length, null, 600);
 
-    let chapterWordCount = 0;
-    let settingWordCount = 0;
+    // Step 2: 优先从预计算的 stats.json 取数 —— 1 个 fetch 代替 ~200 个
+    try {
+        const res = await fetch('web/stats.json?v=53', { cache: 'force-cache' });
+        if (res.ok) {
+            const stats = await res.json();
+            // 合并：stats.files 里没有的文件，走 live fallback（理论上应对得上）
+            const files = stats.files || {};
+            let chapterWordCount = 0;
+            let settingWordCount = 0;
+            const missing = [];
+            for (const item of state.allItems) {
+                if (!item.file) continue;
+                if (item.file in files) {
+                    const wc = files[item.file];
+                    item.wordCount = wc;
+                    if (item.type === 'chapter') chapterWordCount += wc;
+                    else settingWordCount += wc;
+                } else {
+                    missing.push(item);
+                }
+            }
+            // 渲染（带滚动动画）
+            state.cachedChapterWords = chapterWordCount;
+            state.cachedSettingWords = settingWordCount;
+            if (chapterWordsEl) animateCount(chapterWordsEl, chapterWordCount, formatCount, 1200);
+            if (settingWordsEl) animateCount(settingWordsEl, settingWordCount, formatCount, 1200);
+            if (wordsEl) animateCount(wordsEl, chapterWordCount + settingWordCount, formatCount, 1400);
 
-    // 并发 fetch 所有文件计算真实字数
-    const tasks = state.allItems.map(async (item) => {
-        if (!item.file) return;
-        try {
-            const res = await fetch(item.file);
-            if (!res.ok) return;
-            const text = await res.text();
-            // 中文字数：去除 markdown 标记、空白后计算字符数
-            const clean = text.replace(/^#+\s.*$/gm, '').replace(/[#*_`\[\]()>|\-\n\r\s]/g, '');
-            const wc = clean.length;
-            item.wordCount = wc;
-            if (item.type === 'chapter') chapterWordCount += wc;
-            else settingWordCount += wc;
-        } catch (e) { /* 静默跳过不可达文件 */ }
-    });
-    await Promise.all(tasks);
+            console.log(`📊 统计（缓存命中 ${stats.generatedAt || ''}）：设定 ${formatCount(settingWordCount)} / 正文 ${formatCount(chapterWordCount)} / 总 ${formatCount(chapterWordCount + settingWordCount)}${missing.length ? ' / 待补 ' + missing.length : ''}`);
+
+            // 后台补齐缺失项（不阻塞）
+            if (missing.length) updateStatsFallback(missing, true);
+            return;
+        }
+    } catch (e) {
+        console.warn('stats.json 读取失败，回退到 live fetch：', e);
+    }
+
+    // Step 3: stats.json 不可用时，live fetch + 限流 8 并发
+    await updateStatsFallback(state.allItems.filter(i => i.file), false);
+}
+
+async function updateStatsFallback(items, incremental) {
+    const chapterWordsEl = document.getElementById('chapterWords');
+    const settingWordsEl = document.getElementById('settingWords');
+    const wordsEl = document.getElementById('totalWords');
+    const formatCount = (n) => n >= 10000 ? (n / 10000).toFixed(1) + '万' : n.toLocaleString();
+
+    let chapterWordCount = incremental ? state.cachedChapterWords : 0;
+    let settingWordCount = incremental ? state.cachedSettingWords : 0;
+
+    const CONCURRENCY = 8;
+    let i = 0;
+    async function worker() {
+        while (i < items.length) {
+            const it = items[i++];
+            try {
+                const text = await fetchDoc(resolvePath(it.file));
+                const clean = text.replace(/^#+\s.*$/gm, '').replace(/[#*_`\[\]()>|\-\n\r\s]/g, '');
+                const wc = clean.length;
+                it.wordCount = wc;
+                if (it.type === 'chapter') chapterWordCount += wc;
+                else settingWordCount += wc;
+            } catch (e) { /* 静默 */ }
+        }
+    }
+    const workers = Array.from({ length: Math.min(CONCURRENCY, items.length) }, worker);
+    await Promise.all(workers);
 
     state.cachedChapterWords = chapterWordCount;
     state.cachedSettingWords = settingWordCount;
-
     if (chapterWordsEl) chapterWordsEl.textContent = formatCount(chapterWordCount);
     if (settingWordsEl) settingWordsEl.textContent = formatCount(settingWordCount);
-    if (wordsEl) wordsEl.textContent = formatCount(settingWordCount + chapterWordCount);
-
-    console.log(`📊 字数统计: 设定${formatCount(settingWordCount)}, 正文${formatCount(chapterWordCount)}`);
+    if (wordsEl) wordsEl.textContent = formatCount(chapterWordCount + settingWordCount);
+    console.log(`📊 统计（live fetch）：设定 ${formatCount(settingWordCount)} / 正文 ${formatCount(chapterWordCount)}`);
 }
 
 function initProgressTracker() {
@@ -1680,10 +2185,13 @@ function setupRightPanel() {
     panel.id = 'rightPanel';
     panel.className = 'right-panel';
     panel.innerHTML = `
+        <button id="rpCollapse" class="rp-collapse" aria-label="收起" title="收起目录/评论">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"></polyline></svg>
+        </button>
         <div class="rp-tabs">
             <button class="rp-tab active" data-tab="toc">📑 目录</button>
             <button class="rp-tab" data-tab="comments">💬 评论 <span id="rpCommentCount" class="rp-badge"></span></button>
-            <button id="rpClose" class="rp-tab-close">✕</button>
+            <button id="rpClose" class="rp-tab-close" aria-label="关闭">✕</button>
         </div>
         <div class="rp-pane active" id="rpPaneToc">
             <div id="rpTocBody" class="rp-toc-body"></div>
@@ -1698,7 +2206,26 @@ function setupRightPanel() {
         </div>`;
     document.body.appendChild(panel);
 
+    // 收起后的优雅竖条展开按钮（贴在屏幕右缘）
+    if (!document.getElementById('rightPanelRail')) {
+        const rail = document.createElement('button');
+        rail.id = 'rightPanelRail';
+        rail.className = 'right-panel-rail';
+        rail.setAttribute('aria-label', '展开目录/评论');
+        rail.setAttribute('title', '展开目录/评论');
+        rail.innerHTML = `
+            <span class="rail-glow" aria-hidden="true"></span>
+            <span class="rail-icon" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 6 9 12 15 18"></polyline></svg>
+            </span>
+            <span class="rail-label">目录 / 评论</span>
+        `;
+        rail.onclick = () => openRightPanel();
+        document.body.appendChild(rail);
+    }
+
     document.getElementById('rpClose').onclick = () => closeRightPanel();
+    document.getElementById('rpCollapse').onclick = () => closeRightPanel();
     document.getElementById('csSubmitBtn').onclick = () => submitInlineComment();
 
     panel.querySelectorAll('.rp-tab[data-tab]').forEach(tab => {
@@ -1707,6 +2234,19 @@ function setupRightPanel() {
 
     const headerBtn = document.getElementById('rightPanelToggle');
     if (headerBtn) headerBtn.onclick = () => toggleRightPanel();
+
+    // 恢复持久化状态（仅桌面端；移动端保持默认收起）
+    try {
+        const saved = localStorage.getItem('godrise_right_panel_open');
+        if (saved === '1' && window.innerWidth > 1024) {
+            openRightPanel();
+        } else {
+            // 默认收起：显示 rail
+            document.body.classList.add('right-panel-collapsed');
+        }
+    } catch (e) {
+        document.body.classList.add('right-panel-collapsed');
+    }
 }
 
 function switchRightPanelTab(tabName) {
@@ -1726,7 +2266,9 @@ function openRightPanel(focusComment) {
     const panel = document.getElementById('rightPanel');
     panel.classList.add('open');
     document.getElementById('rightPanelToggle')?.classList.add('panel-open');
+    document.body.classList.remove('right-panel-collapsed');
     state.commentSidebarOpen = true;
+    try { localStorage.setItem('godrise_right_panel_open', '1'); } catch (e) {}
     refreshRightPanelContent();
     if (focusComment) {
         switchRightPanelTab('comments');
@@ -1737,7 +2279,14 @@ function openRightPanel(focusComment) {
 function closeRightPanel() {
     document.getElementById('rightPanel')?.classList.remove('open');
     document.getElementById('rightPanelToggle')?.classList.remove('panel-open');
+    // 桌面端收起后在右缘显示 rail 展开按钮；移动端不显示 rail
+    if (window.innerWidth > 1024) {
+        document.body.classList.add('right-panel-collapsed');
+    } else {
+        document.body.classList.remove('right-panel-collapsed');
+    }
     state.commentSidebarOpen = false;
+    try { localStorage.setItem('godrise_right_panel_open', '0'); } catch (e) {}
 }
 
 function refreshRightPanelContent() {

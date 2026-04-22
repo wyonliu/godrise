@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《神临山海》favicon · v59
+  设计：全出血黑底（无白角）+ 铜色"山"字篆印 + 底部微波线（灵机 0.003 Hz 隐喻）
+  16px 可辨、高对比、极简
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="神临山海">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1a1a"/>
+      <stop offset="100%" stop-color="#050505"/>
+    </linearGradient>
+    <linearGradient id="copper" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f5d7a8"/>
+      <stop offset="50%" stop-color="#c88a3a"/>
+      <stop offset="100%" stop-color="#8a5423"/>
+    </linearGradient>
+  </defs>
+  <!-- 全出血黑底：rect 覆盖整个 viewBox，彻底消除白角 -->
+  <rect width="64" height="64" fill="url(#bg)"/>
+  <!-- 铜色内边框（山海印边框意象） -->
+  <rect x="4" y="4" width="56" height="56" fill="none" stroke="url(#copper)" stroke-width="1" opacity="0.35"/>
+  <!-- "山"字：三峰·中峰高·简化篆形 -->
+  <!-- 底横 -->
+  <rect x="12" y="46" width="40" height="3" fill="url(#copper)"/>
+  <!-- 中峰（高） -->
+  <rect x="30" y="14" width="4" height="34" fill="url(#copper)"/>
+  <!-- 左峰 -->
+  <rect x="16" y="24" width="3" height="24" fill="url(#copper)"/>
+  <!-- 右峰 -->
+  <rect x="45" y="24" width="3" height="24" fill="url(#copper)"/>
+  <!-- 底部灵机波·微 0.003 Hz 隐喻：一个不对称波峰 -->
+  <path d="M 10 56 L 22 56 Q 26 56 28 53 Q 30 50 32 50 Q 34 50 36 53 Q 38 56 42 56 L 54 56"
+        fill="none" stroke="url(#copper)" stroke-width="1" opacity="0.7" stroke-linecap="round"/>
+</svg>

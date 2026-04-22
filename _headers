@@ -1,0 +1,11 @@
+# Cloudflare Pages headers
+# 为 parapark 目录下的 md / 图片启用长缓存，缓解冷命中延迟
+
+/parapark/*
+  Cache-Control: public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400
+
+/parapark/images/*
+  Cache-Control: public, max-age=604800, s-maxage=2592000, immutable
+
+/web/chapters.json
+  Cache-Control: public, max-age=300, s-maxage=900, stale-while-revalidate=3600
