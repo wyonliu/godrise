@@ -138,7 +138,6 @@
         "type": "parapark",
         "items": [
           { "title": "ParaPark · 灵机江湖 设计总纲", "file": "parapark/PARAPARK设计总纲.md", "icon": "📘", "slug": "parapark-overview" },
-          { "title": "Omego · 灵武镇单文档交付 v2.0", "file": "world/omego.md", "icon": "🏯", "slug": "omego" },
           { "title": "Omego! 灵武镇 · 游戏化产品设计方案", "file": "world/omego_product.md", "icon": "🎯", "slug": "omego-product" }
         ]
       },
